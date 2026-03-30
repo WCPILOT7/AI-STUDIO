@@ -31,7 +31,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .nav-tab.active{color:var(--bluebr);background:rgba(41,121,255,0.1)}
 .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
 .api-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--card);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:all 0.2s}
-.api-pill:hover{border-color:var(--border3)}
 .api-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .api-pill-txt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textmut)}
@@ -40,7 +39,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .sb-sec{padding:18px 14px 10px}
 .sb-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--textdim);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:10px}
 .add-btn{width:100%;background:transparent;border:1px dashed var(--border3);color:var(--bluedim);padding:9px 12px;border-radius:8px;cursor:pointer;font-family:'Manrope',sans-serif;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;transition:all 0.2s}
-.add-btn:hover{border-color:var(--blue);color:var(--bluebr);background:rgba(41,121,255,0.05);box-shadow:0 0 20px rgba(41,121,255,0.08)}
+.add-btn:hover{border-color:var(--blue);color:var(--bluebr);background:rgba(41,121,255,0.05)}
 .chars-list{flex:1;overflow-y:auto;padding:4px 10px 16px}
 .chars-list::-webkit-scrollbar{width:2px}
 .chars-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -100,8 +99,8 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
 .r-card{background:var(--card);border:1px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.22s;position:relative}
 .r-card:hover{border-color:rgba(41,121,255,0.28);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(41,121,255,0.08)}
-.r-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
-.r-vid{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.r-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;cursor:pointer}
+.r-vid{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;cursor:pointer}
 .r-ph{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,var(--surface),var(--card2));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 .r-loading{width:100%;aspect-ratio:3/4;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .spin{width:28px;height:28px;border-radius:50%;border:1px solid var(--border3);border-top-color:var(--bluebr);animation:spin 0.9s linear infinite}
@@ -126,9 +125,8 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .s-sel option{background:#0a1220}
 .model-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
 .m-pill{padding:7px 6px;border-radius:7px;font-size:11px;font-weight:400;cursor:pointer;border:1px solid var(--border2);color:var(--textmut);background:transparent;font-family:'Manrope',sans-serif;transition:all 0.15s;text-align:center}
-.m-pill.active{border-color:rgba(41,121,255,0.38);color:var(--bluebr);background:rgba(41,121,255,0.09);box-shadow:0 0 12px rgba(41,121,255,0.08)}
+.m-pill.active{border-color:rgba(41,121,255,0.38);color:var(--bluebr);background:rgba(41,121,255,0.09)}
 .m-pill:hover:not(.active){border-color:var(--border3);color:var(--text)}
-.divider{height:1px;background:var(--border);margin:12px 0}
 .glow-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);margin:12px 0;opacity:0.4}
 .settings-page{max-width:660px;margin:0 auto}
 .settings-h{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--white);letter-spacing:-0.01em;margin-bottom:6px}
@@ -160,9 +158,9 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .modal-h{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--white);margin-bottom:5px}
 .modal-p{font-size:12px;color:var(--textmut);margin-bottom:20px;line-height:1.7;font-weight:300}
 .upload-z{border:1px dashed var(--border3);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px;position:relative}
-.upload-z:hover{border-color:var(--blue);background:rgba(41,121,255,0.04);box-shadow:0 0 24px rgba(41,121,255,0.08)}
+.upload-z:hover{border-color:var(--blue);background:rgba(41,121,255,0.04)}
 .upload-file{position:absolute;inset:0;opacity:0;cursor:pointer}
-.upload-prev{width:68px;height:68px;border-radius:10px;object-fit:cover;border:2px solid var(--bluedim);display:none;margin:0 auto 10px;box-shadow:0 0 20px rgba(41,121,255,0.2)}
+.upload-prev{width:68px;height:68px;border-radius:10px;object-fit:cover;border:2px solid var(--bluedim);display:none;margin:0 auto 10px}
 .upload-ico{font-size:24px;margin-bottom:7px}
 .upload-txt{font-size:13px;color:var(--textmut);margin-bottom:3px}
 .upload-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textdim)}
@@ -179,11 +177,19 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .notice-i{color:var(--bluebr);font-size:12px;flex-shrink:0}
 .notice-t{font-size:11px;color:var(--textmut);line-height:1.65;font-weight:300}
 .notice-t strong{color:var(--bluebr);font-weight:500}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--border3);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--text);z-index:500;display:none;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 20px rgba(41,121,255,0.08);font-weight:400;animation:tslide 0.3s ease}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--border3);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--text);z-index:500;display:none;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6);font-weight:400;animation:tslide 0.3s ease}
 .toast.show{display:flex}
 @keyframes tslide{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
 .fade{animation:fade 0.32s ease both}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.lightbox{position:fixed;inset:0;background:rgba(2,4,8,0.96);backdrop-filter:blur(20px);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.lightbox.open{display:flex}
+.lightbox-img{max-width:90vw;max-height:75vh;border-radius:12px;object-fit:contain;box-shadow:0 0 60px rgba(41,121,255,0.2)}
+.lightbox-video{max-width:90vw;max-height:75vh;border-radius:12px;box-shadow:0 0 60px rgba(41,121,255,0.2)}
+.lightbox-close{position:absolute;top:20px;right:24px;background:transparent;border:1px solid var(--border3);color:var(--text);width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.lightbox-close:hover{background:rgba(255,255,255,0.05);border-color:var(--bluebr)}
+.lightbox-actions{display:flex;gap:10px}
+.lightbox-prompt{font-size:11px;color:var(--textmut);max-width:600px;text-align:center;line-height:1.6;font-weight:300;padding:0 20px}
 </style>
 </head>
 <body>
@@ -241,8 +247,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
       <div class="content">
         <div class="settings-page fade">
           <div class="settings-h">Settings</div>
-          <div class="settings-sub">Your API key is stored securely as an environment variable on the server — never exposed in the browser.</div>
-
+          <div class="settings-sub">Your API key is stored securely as an environment variable on the server.</div>
           <div class="settings-section">
             <div class="section-h">API Status</div>
             <div class="section-p">Your Replicate API key is configured on the backend. All generations route through the secure server.</div>
@@ -256,18 +261,16 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
               <div class="info-box"><div class="info-v">~$2</div><div class="info-l">LoRA training</div></div>
             </div>
           </div>
-
           <div class="settings-section">
             <div class="section-h">Models</div>
             <div class="section-p">All models run through Replicate — pay per generation, no subscription.</div>
             <div class="model-info-grid">
               <div class="mic"><div class="mic-name">FLUX.1 Pro</div><div class="mic-use">Image generation</div><div class="mic-price">~$0.05 per image</div></div>
-              <div class="mic"><div class="mic-name">Kling 2.1</div><div class="mic-use">Image → Video</div><div class="mic-price">~$0.40 per video</div></div>
+              <div class="mic"><div class="mic-name">Kling 2.1</div><div class="mic-use">Image to Video</div><div class="mic-price">~$0.40 per video</div></div>
               <div class="mic"><div class="mic-name">FLUX LoRA</div><div class="mic-use">Character training</div><div class="mic-price">~$2 per training run</div></div>
               <div class="mic"><div class="mic-name">Wav2Lip</div><div class="mic-use">Lipsync — coming soon</div><div class="mic-price">~$0.10 per video</div></div>
             </div>
           </div>
-
           <div class="settings-section">
             <div class="section-h">Default Settings</div>
             <div class="section-p">Applied to every generation unless overridden in the studio.</div>
@@ -278,7 +281,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
             <label class="s-lbl">Default aspect ratio</label>
             <select class="s-sel" style="margin:0"><option>Portrait 4:5</option><option selected>Portrait 3:4</option><option>Square 1:1</option><option>Story 9:16</option></select>
           </div>
-
           <div class="settings-section">
             <div class="section-h">Data</div>
             <div class="section-p">Characters and generations are saved in your browser's local storage.</div>
@@ -333,6 +335,19 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
   </div>
 </div>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lightboxImg" style="display:none">
+  <video class="lightbox-video" id="lightboxVid" autoplay muted loop playsinline style="display:none"></video>
+  <div class="lightbox-prompt" id="lightboxPrompt"></div>
+  <div class="lightbox-actions">
+    <button class="btn-ghost" onclick="closeLightbox()">Close</button>
+    <button class="btn-blue" onclick="dlFromLightbox()">↓ Save</button>
+    <button class="btn-ghost" onclick="delFromLightbox()" style="color:var(--red);border-color:#3a1515">Delete</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -341,6 +356,7 @@ let activeId = null;
 let charTab = 'generate';
 let pendingImg = null;
 let animTarget = null;
+let currentLightboxId = null;
 
 renderSidebar();
 
@@ -398,7 +414,6 @@ function renderGenerate() {
   const c = getChar(); if (!c) return;
   const tag = `@${c.name.toLowerCase().replace(/\s+/g,'_')}`;
   const recent = (c.gens||[]).slice().reverse().slice(0,8);
-
   document.getElementById('studioContent').innerHTML = `
   <div class="gen-wrap fade">
     <div class="gen-left">
@@ -456,7 +471,6 @@ function renderGenerate() {
       </div>
     </div>
   </div>`;
-
   const ta = document.getElementById('promptTa');
   const ctr = document.getElementById('charCtr');
   if (ta && ctr) {
@@ -472,13 +486,14 @@ function renderCards(gens) {
         ? `<div class="r-loading"><div class="spin"></div><div class="spin-txt">Generating</div></div>`
         : g.url
           ? g.type==='video'
-            ? `<video class="r-vid" src="${g.url}" autoplay muted loop playsinline></video>`
-            : `<img class="r-img" src="${g.url}">`
+            ? `<video class="r-vid" src="${g.url}" autoplay muted loop playsinline onclick="openLightbox('${g.id}')"></video>`
+            : `<img class="r-img" src="${g.url}" onclick="openLightbox('${g.id}')">`
           : `<div class="r-ph"><div style="font-size:18px;color:var(--bluedim)">◎</div></div>`}
       <span class="r-badge badge-${g.type}">${g.type}</span>
       <div class="r-overlay">
         ${g.type==='image' ? `<button class="r-act pri" onclick="openAnim('${g.id}')">▶ Animate</button>` : ''}
-        <button class="r-act" onclick="dlGen('${g.id}')">↓ Save</button>
+        <button class="r-act" onclick="openLightbox('${g.id}')">⤢ View</button>
+        <button class="r-act" onclick="deleteGen('${g.id}')" style="color:#ef5350">✕</button>
       </div>
     </div>
   `).join('');
@@ -543,41 +558,32 @@ function renderCharSettings() {
   </div>`;
 }
 
-// API CALLS — go through backend, no CORS issues
 async function doGenerate() {
   const c = getChar();
   const prompt = document.getElementById('promptTa')?.value?.trim();
   if (!prompt) { toast('Write a prompt first'); return; }
-
   c.lastPrompt = prompt;
   const btn = document.getElementById('genBtn');
   if (btn) { btn.disabled = true; btn.innerHTML = `<div class="spin" style="width:13px;height:13px;border-width:1px"></div> Generating...`; }
-
   const genId = 'g' + Date.now();
   if (!c.gens) c.gens = [];
   c.gens.push({ id: genId, type: 'image', prompt, url: null, loading: true, createdAt: Date.now() });
   save(); renderGenerate();
-
   try {
     const aspectEl = document.getElementById('aspectRatio');
     const aspectMap = { 'Portrait 4:5': '4:5', 'Portrait 3:4': '3:4', 'Square 1:1': '1:1', 'Story 9:16': '9:16' };
     const aspect = aspectMap[aspectEl?.value] || '3:4';
-
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt, aspect_ratio: aspect })
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Generation failed');
-
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === genId);
     if (g) { g.url = data.url; g.loading = false; save(); renderGenerate(); toast('✦ Image generated — click ▶ Animate to bring her to life'); }
-
   } catch(err) {
-    console.error(err);
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === genId);
     if (g) { g.loading = false; g.error = true; save(); }
@@ -589,34 +595,26 @@ async function doGenerate() {
 async function doAnim() {
   const prompt = document.getElementById('animProm')?.value?.trim();
   if (!prompt) { toast('Describe the motion first'); return; }
-
   const c = getChar();
   const srcGen = (c.gens||[]).find(g => g.id === animTarget);
   const srcUrl = srcGen?.url;
-
   const animId = 'v' + Date.now();
   c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
   save(); closeAnim(); renderGenerate();
   toast('▶ Animating with Kling 2.1 — this takes ~2 mins...');
-
   try {
     const dur = document.getElementById('animDur')?.value?.includes('5') ? 5 : 10;
-
     const res = await fetch('/api/animate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt, image_url: srcUrl, duration: dur })
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Animation failed');
-
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === animId);
     if (g) { g.url = data.url; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete'); }
-
   } catch(err) {
-    console.error(err);
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === animId);
     if (g) { g.loading = false; g.error = true; save(); }
@@ -696,6 +694,51 @@ function closeAnim() {
   animTarget = null;
 }
 
+function openLightbox(genId) {
+  const c = getChar();
+  const g = (c.gens||[]).find(x => x.id === genId);
+  if (!g?.url) return;
+  currentLightboxId = genId;
+  const img = document.getElementById('lightboxImg');
+  const vid = document.getElementById('lightboxVid');
+  if (g.type === 'video') {
+    vid.src = g.url; vid.style.display = 'block'; img.style.display = 'none';
+  } else {
+    img.src = g.url; img.style.display = 'block'; vid.style.display = 'none';
+  }
+  document.getElementById('lightboxPrompt').textContent = g.prompt || '';
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxVid').src = '';
+  currentLightboxId = null;
+}
+
+function dlFromLightbox() {
+  if (!currentLightboxId) return;
+  const c = getChar();
+  const g = (c.gens||[]).find(x => x.id === currentLightboxId);
+  if (!g?.url) return;
+  const a = document.createElement('a'); a.href = g.url;
+  a.download = `${c.name}_${currentLightboxId}`; a.click();
+}
+
+function delFromLightbox() {
+  if (!currentLightboxId) return;
+  deleteGen(currentLightboxId);
+  closeLightbox();
+}
+
+function deleteGen(genId) {
+  const c = getChar();
+  if (!confirm('Delete this generation?')) return;
+  c.gens = (c.gens||[]).filter(g => g.id !== genId);
+  save(); renderCharContent(); renderSidebar();
+  toast('Generation deleted');
+}
+
 function pickPill(el) {
   document.querySelectorAll('.m-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
@@ -730,7 +773,7 @@ function toast(msg) {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeAdd(); closeAnim(); }
+  if (e.key === 'Escape') { closeAdd(); closeAnim(); closeLightbox(); }
 });
 </script>
 </body>
