@@ -13,7 +13,7 @@
   --border:#0e1e36;--border2:#142840;--border3:#1c3654;
   --blue:#2979ff;--bluebr:#448aff;--bluedim:#1a4a8a;--bluemut:#0d2d5c;
   --text:#c0d0e8;--textmut:#506880;--textdim:#253545;--white:#e4eef8;
-  --green:#00e676;--red:#ef5350;
+  --green:#00e676;--red:#ef5350;--orange:#ff9800;
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;font-weight:300;overflow:hidden}
@@ -54,6 +54,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .char-row-count{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textdim);margin-top:1px}
 .char-dot{width:5px;height:5px;border-radius:50%;background:var(--bluebr);box-shadow:0 0 6px var(--blue);opacity:0;flex-shrink:0}
 .char-row.active .char-dot{opacity:1}
+.lora-badge{font-family:'JetBrains Mono',monospace;font-size:8px;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2);padding:1px 5px;border-radius:3px;flex-shrink:0}
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .char-tabs{padding:0 28px;border-bottom:1px solid var(--border);display:flex;gap:0;background:rgba(4,8,16,0.5);flex-shrink:0}
 .char-tab{padding:12px 18px;font-size:11px;font-weight:500;color:var(--textmut);cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;font-family:'Manrope',sans-serif;transition:all 0.2s;margin-bottom:-1px;letter-spacing:0.03em}
@@ -94,6 +95,9 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .btn-blue{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2979ff,#1565c0);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(41,121,255,0.28)}
 .btn-blue:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(41,121,255,0.42);background:linear-gradient(135deg,#448aff,#2979ff)}
 .btn-blue:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-green{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#00c853,#007b33);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,200,83,0.28)}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,200,83,0.42)}
+.btn-green:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--textmut);padding:9px 18px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:400;cursor:pointer;transition:all 0.2s}
 .btn-ghost:hover{border-color:var(--border3);color:var(--text)}
 .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
@@ -190,6 +194,20 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .lightbox-close:hover{background:rgba(255,255,255,0.05);border-color:var(--bluebr)}
 .lightbox-actions{display:flex;gap:10px}
 .lightbox-prompt{font-size:11px;color:var(--textmut);max-width:600px;text-align:center;line-height:1.6;font-weight:300;padding:0 20px}
+/* LoRA specific */
+.lora-photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:16px}
+.lora-photo{width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;border:1px solid var(--border2)}
+.lora-photo-add{width:100%;aspect-ratio:1;border-radius:8px;border:1px dashed var(--border3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--textdim);font-size:20px;transition:all 0.2s;background:var(--card2);position:relative}
+.lora-photo-add:hover{border-color:var(--blue);color:var(--bluebr);background:rgba(41,121,255,0.05)}
+.lora-photo-add input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.training-progress{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:16px;margin-bottom:16px}
+.training-progress-bar{height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin:10px 0}
+.training-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--bluebr));border-radius:2px;transition:width 0.5s ease;animation:progress-pulse 2s ease-in-out infinite}
+@keyframes progress-pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.training-status-txt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textmut);letter-spacing:0.05em}
+.lora-trained-badge{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:9px;margin-bottom:16px}
+.lora-trained-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0}
+.lora-trained-txt{font-size:12px;color:#69f0ae;font-weight:400}
 </style>
 </head>
 <body>
@@ -357,6 +375,8 @@ let charTab = 'generate';
 let pendingImg = null;
 let animTarget = null;
 let currentLightboxId = null;
+let loraPhotos = [];
+let trainingInterval = null;
 
 renderSidebar();
 
@@ -382,6 +402,7 @@ function renderSidebar() {
         <div class="char-row-name">${c.name}</div>
         <div class="char-row-count">${(c.gens||[]).length} generations</div>
       </div>
+      ${c.lora_model ? `<div class="lora-badge">LoRA</div>` : ''}
       <div class="char-dot"></div>
     </div>
   `).join('');
@@ -389,6 +410,7 @@ function renderSidebar() {
 
 function selectChar(id) {
   activeId = id; charTab = 'generate';
+  loraPhotos = [];
   renderSidebar();
   document.getElementById('charTabs').style.display = 'flex';
   document.querySelectorAll('.char-tab').forEach((t,i) => t.classList.toggle('active', i===0));
@@ -421,7 +443,7 @@ function renderGenerate() {
         ${c.img ? `<img class="hero-img" src="${c.img}">` : `<div class="hero-ph">${c.name[0].toUpperCase()}</div>`}
         <div class="hero-info">
           <div class="hero-name">${c.name}</div>
-          <div class="hero-tag">${tag}</div>
+          <div class="hero-tag">${tag} ${c.lora_model ? '<span style="font-size:9px;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2);padding:1px 6px;border-radius:3px;margin-left:6px">LoRA trained ✓</span>' : ''}</div>
           <div class="hero-stats">
             <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='image').length}</div><div class="stat-l">Images</div></div>
             <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='video').length}</div><div class="stat-l">Videos</div></div>
@@ -525,8 +547,12 @@ function filterGal(btn, type) {
 
 function renderCharSettings() {
   const c = getChar();
+  const isTraining = c.lora_training_id && !c.lora_model;
+
   document.getElementById('studioContent').innerHTML = `
-  <div style="max-width:480px" class="fade">
+  <div style="max-width:560px" class="fade">
+
+    <!-- Profile -->
     <div class="settings-section">
       <div class="section-h">Character Profile</div>
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px">
@@ -534,6 +560,7 @@ function renderCharSettings() {
         <div>
           <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white)">${c.name}</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);margin-top:3px">@${c.name.toLowerCase().replace(/\s+/g,'_')}</div>
+          ${c.lora_model ? `<div style="font-size:11px;color:var(--green);margin-top:4px">✓ LoRA model trained</div>` : ''}
         </div>
       </div>
       <label class="m-lbl">Update reference image</label>
@@ -547,17 +574,203 @@ function renderCharSettings() {
         <button class="btn-ghost" onclick="deleteChar('${c.id}')" style="color:var(--red);border-color:#3a1515">Delete character</button>
       </div>
     </div>
+
+    <!-- LoRA Training -->
     <div class="settings-section">
       <div class="section-h">LoRA Training</div>
-      <div class="section-p">Train a dedicated model on ${c.name}'s photos for perfect face consistency.</div>
-      <div class="notice" style="margin:0">
-        <div class="notice-i">⬡</div>
-        <div class="notice-t"><strong>Coming soon</strong> — Upload 20+ photos to lock ${c.name}'s exact face permanently. Train once (~$2), generate forever.</div>
-      </div>
+      <div class="section-p">Train a dedicated AI model on ${c.name}'s photos. Once trained, every generation will lock her exact face, skin tone, and hair texture permanently. Train once (~$2), generate forever.</div>
+
+      ${c.lora_model ? `
+        <!-- Already trained -->
+        <div class="lora-trained-badge">
+          <div class="lora-trained-dot"></div>
+          <div class="lora-trained-txt">✓ ${c.name}'s LoRA model is trained and active — all generations now use her locked identity</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-ghost" onclick="retrainLora('${c.id}')">Retrain with new photos</button>
+        </div>
+      ` : isTraining ? `
+        <!-- Training in progress -->
+        <div class="training-progress">
+          <div class="training-status-txt" id="trainingStatusTxt">⟳ Training in progress — this takes 15-25 minutes...</div>
+          <div class="training-progress-bar"><div class="training-progress-fill" style="width:60%"></div></div>
+          <div style="font-size:10px;color:var(--textdim);margin-top:6px">Training ID: ${c.lora_training_id}</div>
+        </div>
+        <button class="btn-blue" onclick="checkTrainingStatus('${c.id}')" style="margin-bottom:10px">
+          ↻ Check status
+        </button>
+      ` : `
+        <!-- Not trained yet -->
+        <div class="notice" style="margin-bottom:16px">
+          <div class="notice-i">◈</div>
+          <div class="notice-t">Upload <strong>20+ photos</strong> of ${c.name} — different angles, lighting, expressions. More photos = better consistency. Clear face shots work best.</div>
+        </div>
+
+        <div class="lora-photos-grid" id="loraPhotosGrid">
+          <div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()">
+            <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">
+            +
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textmut)" id="loraPhotoCount">0 photos selected</div>
+          <button class="btn-ghost" style="padding:5px 12px;font-size:11px" onclick="document.getElementById('loraFileInput').click()">+ Add more</button>
+        </div>
+
+        <button class="btn-green" onclick="startLoraTraining('${c.id}')" id="trainBtn" disabled style="width:100%">
+          ◈ Start LoRA Training (~$2 · 20 mins)
+        </button>
+      `}
     </div>
+
   </div>`;
+
+  // Resume polling if training is in progress
+  if (isTraining) {
+    startTrainingPoll(c.id);
+  }
 }
 
+// ── LORA PHOTO HANDLING ──
+function addLoraPhotos(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      loraPhotos.push(e.target.result);
+      updateLoraGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function updateLoraGrid() {
+  const grid = document.getElementById('loraPhotosGrid');
+  const count = document.getElementById('loraPhotoCount');
+  const trainBtn = document.getElementById('trainBtn');
+  if (!grid) return;
+
+  const photoHtml = loraPhotos.map((p, i) => `
+    <div style="position:relative">
+      <img src="${p}" class="lora-photo">
+      <button onclick="removeLoraPhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    </div>
+  `).join('');
+
+  grid.innerHTML = photoHtml + `
+    <div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()">
+      <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">
+      +
+    </div>`;
+
+  if (count) count.textContent = `${loraPhotos.length} photo${loraPhotos.length===1?'':'s'} selected`;
+  if (trainBtn) {
+    trainBtn.disabled = loraPhotos.length < 5;
+    trainBtn.textContent = loraPhotos.length < 5
+      ? `◈ Need at least 5 photos (${loraPhotos.length} added)`
+      : `◈ Start LoRA Training — ${loraPhotos.length} photos (~$2 · 20 mins)`;
+  }
+}
+
+function removeLoraPhoto(index) {
+  loraPhotos.splice(index, 1);
+  updateLoraGrid();
+}
+
+function retrainLora(charId) {
+  loraPhotos = [];
+  const c = chars.find(x => x.id === charId);
+  if (c) { c.lora_model = null; c.lora_training_id = null; save(); renderCharSettings(); }
+}
+
+// ── START LORA TRAINING ──
+async function startLoraTraining(charId) {
+  const c = chars.find(x => x.id === charId);
+  if (!c) return;
+  if (loraPhotos.length < 5) { toast('Add at least 5 photos first'); return; }
+
+  const btn = document.getElementById('trainBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting training...'; }
+
+  toast('Starting LoRA training — this will take 15-25 minutes');
+
+  try {
+    const res = await fetch('/api/train', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        images: loraPhotos,
+        character_name: c.name
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Training failed to start');
+
+    c.lora_training_id = data.training_id;
+    save();
+    loraPhotos = [];
+    renderCharSettings();
+    toast('✦ Training started! Come back in 20 mins to check status');
+
+  } catch(err) {
+    toast('Training error: ' + (err.message || 'Failed'));
+    if (btn) { btn.disabled = false; btn.textContent = `◈ Start LoRA Training (~$2 · 20 mins)`; }
+  }
+}
+
+// ── CHECK TRAINING STATUS ──
+async function checkTrainingStatus(charId) {
+  const c = chars.find(x => x.id === charId);
+  if (!c?.lora_training_id) return;
+
+  const btn = document.querySelector('[onclick*="checkTrainingStatus"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
+
+  try {
+    const res = await fetch('/api/trainStatus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ training_id: c.lora_training_id })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to check status');
+
+    const statusTxt = document.getElementById('trainingStatusTxt');
+
+    if (data.status === 'succeeded' && data.model_id) {
+      c.lora_model = data.model_id;
+      c.lora_training_id = null;
+      save();
+      renderSidebar();
+      renderCharSettings();
+      toast(`✦ ${c.name}'s LoRA training complete! Her face is now locked.`);
+    } else if (data.status === 'failed') {
+      c.lora_training_id = null;
+      save();
+      renderCharSettings();
+      toast('Training failed — try again with more photos');
+    } else {
+      if (statusTxt) statusTxt.textContent = `⟳ Still training (${data.status}) — check again in a few minutes`;
+      if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
+      toast(`Status: ${data.status} — training still in progress`);
+    }
+
+  } catch(err) {
+    toast('Error: ' + (err.message || 'Failed'));
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
+  }
+}
+
+function startTrainingPoll(charId) {
+  if (trainingInterval) clearInterval(trainingInterval);
+  // Auto-check every 2 minutes
+  trainingInterval = setInterval(() => checkTrainingStatus(charId), 120000);
+}
+
+// ── GENERATE ──
 async function doGenerate() {
   const c = getChar();
   const prompt = document.getElementById('promptTa')?.value?.trim();
@@ -573,10 +786,12 @@ async function doGenerate() {
     const aspectEl = document.getElementById('aspectRatio');
     const aspectMap = { 'Portrait 4:5': '4:5', 'Portrait 3:4': '3:4', 'Square 1:1': '1:1', 'Story 9:16': '9:16' };
     const aspect = aspectMap[aspectEl?.value] || '3:4';
+    const body = { prompt, aspect_ratio: aspect };
+    if (c.lora_model) body.lora_model = c.lora_model;
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, aspect_ratio: aspect })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Generation failed');
@@ -592,6 +807,7 @@ async function doGenerate() {
   }
 }
 
+// ── ANIMATE ──
 async function doAnim() {
   const prompt = document.getElementById('animProm')?.value?.trim();
   if (!prompt) { toast('Describe the motion first'); return; }
@@ -623,6 +839,7 @@ async function doAnim() {
   }
 }
 
+// ── CHARACTER CRUD ──
 function openAdd() {
   pendingImg = null;
   document.getElementById('addModal').classList.add('open');
@@ -682,6 +899,7 @@ function updateCharName(name, id) {
   if (c && name.trim()) { c.name = name.trim(); save(); renderSidebar(); }
 }
 
+// ── ANIMATE MODAL ──
 function openAnim(genId) {
   animTarget = genId;
   document.getElementById('animModal').classList.add('open');
@@ -694,6 +912,7 @@ function closeAnim() {
   animTarget = null;
 }
 
+// ── LIGHTBOX ──
 function openLightbox(genId) {
   const c = getChar();
   const g = (c.gens||[]).find(x => x.id === genId);
@@ -739,6 +958,7 @@ function deleteGen(genId) {
   toast('Generation deleted');
 }
 
+// ── UTILS ──
 function pickPill(el) {
   document.querySelectorAll('.m-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
