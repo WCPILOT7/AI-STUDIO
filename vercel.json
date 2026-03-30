@@ -1,19 +1,13 @@
-{{
+{
   "version": 2,
-  "builds": [
-    {
-      "src": "api/server.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
       "src": "/api/generate",
-      "dest": "/api/server.js"
+      "dest": "/api/generate.js"
     },
     {
       "src": "/api/animate",
-      "dest": "/api/server.js"
+      "dest": "/api/animate.js"
     },
     {
       "src": "/(.*)",
