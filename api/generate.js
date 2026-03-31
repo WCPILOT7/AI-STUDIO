@@ -18,10 +18,12 @@ module.exports = async (req, res) => {
           'Authorization': `Key ${falKey}`,
           'Content-Type': 'application/json'
         },
-      body: JSON.stringify({
+     body: JSON.stringify({
   prompt,
   image_urls: [reference_image],
-  num_images: 1
+  num_images: 1,
+  image_size: 'portrait_4_3',
+  enhance_prompt_mode: 'standard'
 })
       });
 
