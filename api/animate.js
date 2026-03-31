@@ -16,21 +16,22 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         prompt,
         image_url,
-        duration: duration === 5 ? '5' : '10',
-        aspect_ratio: '9:16',
-        negative_prompt: 'blur, distortion, watermark, low quality'
+        duration: '10',
+        aspect_ratio: '16:9'
       })
     });
 
     const submitText = await submitRes.text();
+    console.log('Submit response:', submitText.slice(0, 500));
+
     let submitData;
     try { submitData = JSON.parse(submitText); }
-    catch(e) { throw new Error('fal submit failed: ' + submitText.slice(0, 200)); }
+    catch(e) { throw new Error('Submit parse failed: ' + submitText.slice(0, 300)); }
 
-    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || submitText.slice(0, 200));
+    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || JSON.stringify(submitData).slice(0, 200));
 
     const requestId = submitData.request_id;
-    if (!requestId) throw new Error('No request_id: ' + JSON.stringify(submitData));
+    if (!requestId) throw new Error('No request_id returned: ' + JSON.stringify(submitData));
 
     const videoUrl = await pollFal('fal-ai/kling-video/v2.1/standard/image-to-video', requestId, falKey);
     return res.json({ url: videoUrl });
@@ -43,7 +44,7 @@ module.exports = async (req, res) => {
 
 async function pollFal(endpoint, requestId, key, max = 90) {
   for (let i = 0; i < max; i++) {
-    await new Promise(r => setTimeout(r, 4000));
+    await new Promise(r => setTimeout(r, 5000));
     try {
       const res = await fetch(
         `https://queue.fal.run/${endpoint}/requests/${requestId}/status`,
@@ -56,20 +57,24 @@ async function pollFal(endpoint, requestId, key, max = 90) {
       try { data = JSON.parse(text); }
       catch(e) { continue; }
 
+      console.log('Poll status:', data.status);
+
       if (data.status === 'COMPLETED') {
         const resultRes = await fetch(
           `https://queue.fal.run/${endpoint}/requests/${requestId}`,
           { headers: { 'Authorization': `Key ${key}` } }
         );
         const resultText = await resultRes.text();
-        const result = JSON.parse(resultText);
+        let result;
+        try { result = JSON.parse(resultText); }
+        catch(e) { throw new Error('Result parse failed: ' + resultText.slice(0, 200)); }
         return result.video?.url || result.videos?.[0]?.url || null;
       }
-      if (data.status === 'FAILED') throw new Error(data.error || 'Animation failed');
+      if (data.status === 'FAILED') throw new Error(data.error || data.detail || 'Animation failed');
     } catch(e) {
-      if (e.message === 'Animation failed') throw e;
+      if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
       continue;
     }
   }
-  throw new Error('Animation timed out');
+  throw new Error('Animation timed out after 7.5 minutes');
 }
