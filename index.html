@@ -787,7 +787,8 @@ async function doGenerate() {
     const aspectMap = { 'Portrait 4:5': '4:5', 'Portrait 3:4': '3:4', 'Square 1:1': '1:1', 'Story 9:16': '9:16' };
     const aspect = aspectMap[aspectEl?.value] || '3:4';
     const body = { prompt, aspect_ratio: aspect };
-    if (c.lora_model) body.lora_model = c.lora_model;
+if (c.lora_model) body.lora_model = c.lora_model;
+if (c.img && !c.lora_model) body.reference_image = c.img;
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
