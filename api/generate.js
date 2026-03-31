@@ -46,19 +46,29 @@ module.exports = async (req, res) => {
       const falAspect = aspectMap[aspect_ratio] || '3:4';
 
       // Submit to fal.ai
-      const submitRes = await fetch('https://queue.fal.run/fal-ai/consistent-character', {
+      const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
+```
+
+And change the poll URLs too — find both instances of:
+```
+fal-ai/consistent-character
+```
+
+Replace both with:
+```
+fal-ai/instant-character
         method: 'POST',
         headers: {
           'Authorization': `Key ${falKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          prompt,
-          subject_image_url: reference_image,
-          num_images: 1,
-          output_format: 'jpeg',
-          aspect_ratio: falAspect
-        })
+  prompt,
+  reference_image_url: reference_image,
+  num_images: 1,
+  output_format: 'jpeg',
+  aspect_ratio: falAspect
+})
       });
 
       const submitData = await submitRes.json();
