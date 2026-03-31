@@ -5,46 +5,61 @@ module.exports = async (req, res) => {
 
   try {
     const { prompt, image_url, duration } = req.body;
-    const key = process.env.REPLICATE_API_TOKEN;
+    const falKey = process.env.FAL_API_KEY;
 
-    const response = await fetch(
-      'https://api.replicate.com/v1/models/klingai/kling-v2.1-standard-image2video/predictions',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${key}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          input: {
-            prompt,
-            start_image: image_url,
-            duration: duration || 10,
-            cfg_scale: 0.5,
-            negative_prompt: 'blur, distortion, watermark, low quality'
-          }
-        })
-      }
-    );
+    // Use fal.ai Kling for animation
+    const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${falKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt,
+        image_url,
+        duration: duration === 5 ? '5' : '10',
+        aspect_ratio: '9:16',
+        negative_prompt: 'blur, distortion, watermark, low quality'
+      })
+    });
 
-    const data = await response.json();
-    if (!response.ok) return res.status(400).json({ error: data.detail || 'Failed' });
+    const submitText = await submitRes.text();
+    let submitData;
+    try { submitData = JSON.parse(submitText); }
+    catch(e) { throw new Error('fal submit failed: ' + submitText.slice(0, 200)); }
 
-    const url = await poll(data.urls?.get || data.url, key);
-    return res.json({ url });
+    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || submitText.slice(0, 200));
+
+    const requestId = submitData.request_id;
+    if (!requestId) throw new Error('No request_id: ' + JSON.stringify(submitData));
+
+    // Poll for result
+    const videoUrl = await pollFal('fal-ai/kling-video/v2.1/standard/image-to-video', requestId, falKey);
+    return res.json({ url: videoUrl });
 
   } catch(err) {
-    return res.status(500).json({ error: err.message });
+    console.error('Animate error:', err.message);
+    return res.status(500).json({ error: err.message || String(err) });
   }
 };
 
-async function poll(url, key, max = 90) {
+async function pollFal(endpoint, requestId, key, max = 90) {
   for (let i = 0; i < max; i++) {
-    await new Promise(r => setTimeout(r, 3000));
-    const r = await fetch(url, { headers: { 'Authorization': `Bearer ${key}` } });
-    const d = await r.json();
-    if (d.status === 'succeeded') return Array.isArray(d.output) ? d.output[0] : d.output;
-    if (d.status === 'failed') throw new Error(d.error || 'Failed');
+    await new Promise(r => setTimeout(r, 4000));
+    const res = await fetch(
+      `https://queue.fal.run/${endpoint}/requests/${requestId}/status`,
+      { headers: { 'Authorization': `Key ${key}` } }
+    );
+    const data = await res.json();
+    if (data.status === 'COMPLETED') {
+      const resultRes = await fetch(
+        `https://queue.fal.run/${endpoint}/requests/${requestId}`,
+        { headers: { 'Authorization': `Key ${key}` } }
+      );
+      const result = await resultRes.json();
+      return result.video?.url || result.videos?.[0]?.url || null;
+    }
+    if (data.status === 'FAILED') throw new Error('Animation failed');
   }
-  throw new Error('Timed out');
+  throw new Error('Animation timed out');
 }
