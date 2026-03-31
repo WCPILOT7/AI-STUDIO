@@ -7,7 +7,6 @@ module.exports = async (req, res) => {
     const { prompt, image_url, duration } = req.body;
     const falKey = process.env.FAL_API_KEY;
 
-    // Use fal.ai Kling for animation
     const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
       method: 'POST',
       headers: {
@@ -33,7 +32,6 @@ module.exports = async (req, res) => {
     const requestId = submitData.request_id;
     if (!requestId) throw new Error('No request_id: ' + JSON.stringify(submitData));
 
-    // Poll for result
     const videoUrl = await pollFal('fal-ai/kling-video/v2.1/standard/image-to-video', requestId, falKey);
     return res.json({ url: videoUrl });
 
@@ -46,20 +44,32 @@ module.exports = async (req, res) => {
 async function pollFal(endpoint, requestId, key, max = 90) {
   for (let i = 0; i < max; i++) {
     await new Promise(r => setTimeout(r, 4000));
-    const res = await fetch(
-      `https://queue.fal.run/${endpoint}/requests/${requestId}/status`,
-      { headers: { 'Authorization': `Key ${key}` } }
-    );
-    const data = await res.json();
-    if (data.status === 'COMPLETED') {
-      const resultRes = await fetch(
-        `https://queue.fal.run/${endpoint}/requests/${requestId}`,
+    try {
+      const res = await fetch(
+        `https://queue.fal.run/${endpoint}/requests/${requestId}/status`,
         { headers: { 'Authorization': `Key ${key}` } }
       );
-      const result = await resultRes.json();
-      return result.video?.url || result.videos?.[0]?.url || null;
+      const text = await res.text();
+      if (!text || text.trim() === '') continue;
+
+      let data;
+      try { data = JSON.parse(text); }
+      catch(e) { continue; }
+
+      if (data.status === 'COMPLETED') {
+        const resultRes = await fetch(
+          `https://queue.fal.run/${endpoint}/requests/${requestId}`,
+          { headers: { 'Authorization': `Key ${key}` } }
+        );
+        const resultText = await resultRes.text();
+        const result = JSON.parse(resultText);
+        return result.video?.url || result.videos?.[0]?.url || null;
+      }
+      if (data.status === 'FAILED') throw new Error(data.error || 'Animation failed');
+    } catch(e) {
+      if (e.message === 'Animation failed') throw e;
+      continue;
     }
-    if (data.status === 'FAILED') throw new Error('Animation failed');
   }
   throw new Error('Animation timed out');
 }
