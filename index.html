@@ -871,10 +871,11 @@ function onFile(inp) {
   reader.readAsDataURL(file);
 }
 
-function saveChar() {
+async function saveChar() {
   const name = document.getElementById('nameInp').value.trim();
   if (!name) { toast('Enter a character name'); return; }
-  const c = { id: 'c' + Date.now(), name, img: pendingImg, gens: [], lastPrompt: '', createdAt: Date.now() };
+  const compressedImg = pendingImg ? await compressImage(pendingImg, 512) : null;
+  const c = { id: 'c' + Date.now(), name, img: compressedImg, gens: [], lastPrompt: '', createdAt: Date.now() };
   chars.push(c); save(); closeAdd(); selectChar(c.id); toast(`✦ ${name} created`);
 }
 
@@ -999,6 +1000,21 @@ document.addEventListener('keydown', e => {
 </script>
 </body>
 </html>
+function compressImage(base64, maxSize) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = base64;
+  });
+}
 function compressImage(base64, maxSize) {
   return new Promise(resolve => {
     const img = new Image();
