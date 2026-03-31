@@ -889,9 +889,12 @@ function deleteChar(id) {
 function updateCharImg(inp, id) {
   const file = inp.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     const c = chars.find(x => x.id === id);
-    if (c) { c.img = e.target.result; save(); renderCharContent(); toast('Reference image updated'); }
+    if (c) {
+      c.img = await compressImage(e.target.result, 512);
+      save(); renderCharContent(); toast('Reference image updated');
+    }
   };
   reader.readAsDataURL(file);
 }
