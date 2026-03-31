@@ -15,13 +15,15 @@ module.exports = async (req, res) => {
       const base64Data = reference_image.split(',')[1];
       const buffer = Buffer.from(base64Data, 'base64');
 
-      const uploadRes = await fetch('https://rest.alpha.fal.ai/storage/upload', {
+      const uploadRes = await fetch('https://fal.run/storage/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Key ${falKey}`,
-          'Content-Type': 'image/jpeg'
-        },
-        body: buffer
+  'Authorization': `Key ${falKey}`,
+  'Accept': 'application/json',
+  'Content-Type': 'image/jpeg',
+  'Content-Length': String(buffer.length)
+},
+body: buffer
       });
 
       const uploadText = await uploadRes.text();
