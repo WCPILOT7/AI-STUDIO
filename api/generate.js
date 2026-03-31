@@ -4,39 +4,14 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { prompt, aspect_ratio, reference_image, lora_model } = req.body;
+    const { prompt, aspect_ratio, reference_image } = req.body;
     const falKey = process.env.FAL_API_KEY;
     const repKey = process.env.REPLICATE_API_TOKEN;
 
     let imageUrl = null;
 
     if (reference_image && falKey) {
-      // Upload image to fal storage
-      const base64Data = reference_image.split(',')[1];
-      const buffer = Buffer.from(base64Data, 'base64');
-
-      const uploadRes = await fetch('https://fal.run/storage/upload', {
-        method: 'POST',
-        headers: {
-  'Authorization': `Key ${falKey}`,
-  'Accept': 'application/json',
-  'Content-Type': 'image/jpeg',
-  'Content-Length': String(buffer.length)
-},
-body: buffer
-      });
-
-      const uploadText = await uploadRes.text();
-      let uploadData;
-      try { uploadData = JSON.parse(uploadText); }
-      catch(e) { throw new Error('fal upload failed: ' + uploadText.slice(0, 100)); }
-
-      if (!uploadRes.ok) throw new Error('fal upload error: ' + (uploadData.detail || uploadText.slice(0, 100)));
-
-      const imageStorageUrl = uploadData.access_url || uploadData.url || uploadData.file_url;
-      if (!imageStorageUrl) throw new Error('No URL returned from fal upload: ' + JSON.stringify(uploadData));
-
-      // Submit to instant-character
+      // Send base64 directly to fal.ai — no upload needed
       const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
         method: 'POST',
         headers: {
@@ -45,7 +20,7 @@ body: buffer
         },
         body: JSON.stringify({
           prompt,
-          image_url: imageStorageUrl,
+          image_url: reference_image,
           num_images: 1,
           guidance_scale: 7
         })
@@ -54,11 +29,13 @@ body: buffer
       const submitText = await submitRes.text();
       let submitData;
       try { submitData = JSON.parse(submitText); }
-      catch(e) { throw new Error('fal submit failed: ' + submitText.slice(0, 100)); }
+      catch(e) { throw new Error('fal submit parse failed: ' + submitText.slice(0, 200)); }
 
-      if (!submitRes.ok) throw new Error('fal submit error: ' + (submitData.detail || submitText.slice(0, 100)));
+      if (!submitRes.ok) throw new Error('fal error: ' + (submitData.detail || submitData.message || submitText.slice(0, 200)));
 
       const requestId = submitData.request_id;
+      if (!requestId) throw new Error('No request_id from fal: ' + JSON.stringify(submitData));
+
       imageUrl = await pollFal('fal-ai/instant-character', requestId, falKey);
 
     } else {
