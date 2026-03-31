@@ -11,36 +11,30 @@ module.exports = async (req, res) => {
     let imageUrl = null;
 
     if (reference_image && falKey) {
-      // Step 1 — Upload reference image to fal storage
+      // Upload image to fal storage
       const base64Data = reference_image.split(',')[1];
       const buffer = Buffer.from(base64Data, 'base64');
-      const mimeType = reference_image.split(';')[0].split(':')[1] || 'image/jpeg';
 
-      const uploadRes = await fetch('https://rest.alpha.fal.ai/storage/upload/initiate', {
+      const uploadRes = await fetch('https://rest.alpha.fal.ai/storage/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Key ${falKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'image/jpeg'
         },
-        body: JSON.stringify({
-          content_type: mimeType,
-          file_size: buffer.length
-        })
-      });
-
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error(uploadData.detail || 'fal upload initiation failed');
-
-      // Upload to the presigned URL
-      await fetch(uploadData.upload_url, {
-        method: 'PUT',
-        headers: { 'Content-Type': mimeType },
         body: buffer
       });
 
-      const imageStorageUrl = uploadData.file_url;
+      const uploadText = await uploadRes.text();
+      let uploadData;
+      try { uploadData = JSON.parse(uploadText); }
+      catch(e) { throw new Error('fal upload failed: ' + uploadText.slice(0, 100)); }
 
-      // Step 2 — Submit to instant-character
+      if (!uploadRes.ok) throw new Error('fal upload error: ' + (uploadData.detail || uploadText.slice(0, 100)));
+
+      const imageStorageUrl = uploadData.access_url || uploadData.url || uploadData.file_url;
+      if (!imageStorageUrl) throw new Error('No URL returned from fal upload: ' + JSON.stringify(uploadData));
+
+      // Submit to instant-character
       const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
         method: 'POST',
         headers: {
@@ -55,15 +49,14 @@ module.exports = async (req, res) => {
         })
       });
 
-      if (!submitRes.ok) {
-        const errText = await submitRes.text();
-        throw new Error(errText || 'fal submission failed');
-      }
+      const submitText = await submitRes.text();
+      let submitData;
+      try { submitData = JSON.parse(submitText); }
+      catch(e) { throw new Error('fal submit failed: ' + submitText.slice(0, 100)); }
 
-      const submitData = await submitRes.json();
+      if (!submitRes.ok) throw new Error('fal submit error: ' + (submitData.detail || submitText.slice(0, 100)));
+
       const requestId = submitData.request_id;
-
-      // Step 3 — Poll for result
       imageUrl = await pollFal('fal-ai/instant-character', requestId, falKey);
 
     } else {
@@ -97,8 +90,8 @@ module.exports = async (req, res) => {
     return res.json({ url: imageUrl });
 
   } catch(err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error('Generate error:', err.message);
+    return res.status(500).json({ error: err.message || String(err) });
   }
 };
 
@@ -118,9 +111,9 @@ async function pollFal(endpoint, requestId, key, max = 60) {
       const result = await resultRes.json();
       return result.images?.[0]?.url || result.image?.url || null;
     }
-    if (data.status === 'FAILED') throw new Error('fal.ai generation failed');
+    if (data.status === 'FAILED') throw new Error('fal generation failed');
   }
-  throw new Error('fal.ai timed out');
+  throw new Error('fal timed out');
 }
 
 async function pollReplicate(url, key, max = 60) {
