@@ -13,7 +13,7 @@
   --border:#0e1e36;--border2:#142840;--border3:#1c3654;
   --blue:#2979ff;--bluebr:#448aff;--bluedim:#1a4a8a;--bluemut:#0d2d5c;
   --text:#c0d0e8;--textmut:#506880;--textdim:#253545;--white:#e4eef8;
-  --green:#00e676;--red:#ef5350;--orange:#ff9800;
+  --green:#00e676;--red:#ef5350;--orange:#ff9800;--purple:#9c27b0;
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;font-weight:300;overflow:hidden}
@@ -30,7 +30,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .nav-tab:hover{color:var(--text)}
 .nav-tab.active{color:var(--bluebr);background:rgba(41,121,255,0.1)}
 .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
-.api-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--card);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:all 0.2s}
+.api-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--card);border:1px solid var(--border2);border-radius:20px}
 .api-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .api-pill-txt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textmut)}
@@ -98,15 +98,19 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .btn-green{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#00c853,#007b33);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,200,83,0.28)}
 .btn-green:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,200,83,0.42)}
 .btn-green:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-purple{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#9c27b0,#6a1b9a);border:none;color:#fff;padding:9px 20px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(156,39,176,0.28)}
+.btn-purple:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(156,39,176,0.42)}
+.btn-purple:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--textmut);padding:9px 18px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:400;cursor:pointer;transition:all 0.2s}
 .btn-ghost:hover{border-color:var(--border3);color:var(--text)}
 .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
 .r-card{background:var(--card);border:1px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.22s;position:relative}
 .r-card:hover{border-color:rgba(41,121,255,0.28);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(41,121,255,0.08)}
 .r-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;cursor:pointer}
-.r-vid{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;cursor:pointer}
+.r-vid{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;cursor:pointer}
 .r-ph{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,var(--surface),var(--card2));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 .r-loading{width:100%;aspect-ratio:3/4;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.r-loading-vid{width:100%;aspect-ratio:9/16;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .spin{width:28px;height:28px;border-radius:50%;border:1px solid var(--border3);border-top-color:var(--bluebr);animation:spin 0.9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin-txt{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--textmut);letter-spacing:0.15em;text-transform:uppercase;animation:blink 1.5s ease-in-out infinite}
@@ -194,12 +198,42 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .lightbox-close:hover{background:rgba(255,255,255,0.05);border-color:var(--bluebr)}
 .lightbox-actions{display:flex;gap:10px}
 .lightbox-prompt{font-size:11px;color:var(--textmut);max-width:600px;text-align:center;line-height:1.6;font-weight:300;padding:0 20px}
+/* Scene Studio */
+.scene-wrap{display:grid;grid-template-columns:1fr 320px;gap:20px;height:100%;min-height:0}
+.scene-left{display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.scene-right{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.scene-hero{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:18px;position:relative;overflow:hidden;flex-shrink:0}
+.scene-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(156,39,176,0.5),transparent)}
+.scene-hero-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--white);margin-bottom:4px}
+.scene-hero-sub{font-size:12px;color:var(--textmut);font-weight:300;line-height:1.6}
+.mode-tabs{display:flex;gap:6px;margin-bottom:16px}
+.mode-tab{flex:1;padding:8px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);color:var(--textmut);background:transparent;font-family:'Manrope',sans-serif;transition:all 0.15s;text-align:center}
+.mode-tab.active{border-color:rgba(156,39,176,0.4);color:#ce93d8;background:rgba(156,39,176,0.09)}
+.mode-tab:hover:not(.active){border-color:var(--border3);color:var(--text)}
+.scene-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.scene-type{padding:10px 12px;border-radius:9px;border:1px solid var(--border2);cursor:pointer;transition:all 0.15s;background:transparent}
+.scene-type:hover{border-color:var(--border3);background:rgba(255,255,255,0.02)}
+.scene-type.active{border-color:rgba(156,39,176,0.35);background:rgba(156,39,176,0.07)}
+.scene-type-icon{font-size:18px;margin-bottom:5px}
+.scene-type-name{font-size:11px;font-weight:500;color:var(--white);margin-bottom:2px}
+.scene-type-desc{font-size:10px;color:var(--textmut);font-weight:300}
+.scene-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.scene-card{background:var(--card);border:1px solid var(--border2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.22s;position:relative}
+.scene-card:hover{border-color:rgba(156,39,176,0.3);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.scene-img{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}
+.scene-vid{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}
+.scene-loading{width:100%;aspect-ratio:9/16;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.scene-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(2,4,8,0.97));padding:20px 8px 9px;opacity:0;transition:opacity 0.18s;display:flex;gap:5px}
+.scene-card:hover .scene-overlay{opacity:1}
+.img-upload-zone{border:1px dashed var(--border3);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;margin-bottom:12px}
+.img-upload-zone:hover{border-color:rgba(156,39,176,0.4);background:rgba(156,39,176,0.04)}
+.img-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-upload-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:10px;display:none}
 /* LoRA specific */
 .lora-photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:16px}
 .lora-photo{width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;border:1px solid var(--border2)}
 .lora-photo-add{width:100%;aspect-ratio:1;border-radius:8px;border:1px dashed var(--border3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--textdim);font-size:20px;transition:all 0.2s;background:var(--card2);position:relative}
 .lora-photo-add:hover{border-color:var(--blue);color:var(--bluebr);background:rgba(41,121,255,0.05)}
-.lora-photo-add input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .training-progress{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:16px;margin-bottom:16px}
 .training-progress-bar{height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin:10px 0}
 .training-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--bluebr));border-radius:2px;transition:width 0.5s ease;animation:progress-pulse 2s ease-in-out infinite}
@@ -218,7 +252,8 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     <div class="nav-logo-tag">Beta</div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" id="tabStudio" onclick="navTo('studio')">Studio</button>
+    <button class="nav-tab active" id="tabStudio" onclick="navTo('studio')">Character Studio</button>
+    <button class="nav-tab" id="tabScene" onclick="navTo('scene')">Scene Studio</button>
     <button class="nav-tab" id="tabSettings" onclick="navTo('settings')">⚙ Settings</button>
   </div>
   <div class="nav-right">
@@ -242,6 +277,8 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
   </aside>
 
   <main class="main">
+
+    <!-- CHARACTER STUDIO -->
     <div id="studioView" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
       <div class="char-tabs" id="charTabs" style="display:none">
         <button class="char-tab active" onclick="setCharTab('generate',this)">Generate</button>
@@ -261,43 +298,147 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
       </div>
     </div>
 
+    <!-- SCENE STUDIO -->
+    <div id="sceneView" style="display:none;height:100%;overflow:hidden;flex-direction:column">
+      <div class="content" style="height:100%">
+        <div class="scene-wrap fade" id="sceneWrap">
+          <div class="scene-left">
+            <div class="scene-hero">
+              <div class="scene-hero-title">Scene Studio</div>
+              <div class="scene-hero-sub">Generate cinematic scenes, POV shots, moody environments and story moments for Soul AI Flames social content.</div>
+            </div>
+
+            <!-- Mode selector -->
+            <div class="panel-card">
+              <div class="panel-ttl">Generation Mode</div>
+              <div class="mode-tabs">
+                <button class="mode-tab active" onclick="setSceneMode('text-to-video',this)">▶ Text to Video</button>
+                <button class="mode-tab" onclick="setSceneMode('text-to-image',this)">◎ Text to Image</button>
+                <button class="mode-tab" onclick="setSceneMode('image-to-video',this)">⬡ Image to Video</button>
+              </div>
+
+              <!-- Scene type selector -->
+              <div class="panel-ttl" style="margin-top:4px">Scene Type</div>
+              <div class="scene-type-grid">
+                <div class="scene-type active" onclick="pickSceneType(this,'pov')">
+                  <div class="scene-type-icon">👁</div>
+                  <div class="scene-type-name">POV Shot</div>
+                  <div class="scene-type-desc">First person perspective</div>
+                </div>
+                <div class="scene-type" onclick="pickSceneType(this,'environment')">
+                  <div class="scene-type-icon">🏙</div>
+                  <div class="scene-type-name">Environment</div>
+                  <div class="scene-type-desc">Apartments, cafes, streets</div>
+                </div>
+                <div class="scene-type" onclick="pickSceneType(this,'mood')">
+                  <div class="scene-type-icon">🕯</div>
+                  <div class="scene-type-name">Mood & Aesthetic</div>
+                  <div class="scene-type-desc">Rain, candles, city nights</div>
+                </div>
+                <div class="scene-type" onclick="pickSceneType(this,'story')">
+                  <div class="scene-type-icon">📱</div>
+                  <div class="scene-type-name">Story Moment</div>
+                  <div class="scene-type-desc">Door opens, phone rings</div>
+                </div>
+              </div>
+
+              <!-- Image upload for image-to-video mode -->
+              <div id="sceneImgUpload" style="display:none">
+                <div class="panel-ttl">Source Image</div>
+                <div class="img-upload-zone" onclick="document.getElementById('sceneImgInput').click()">
+                  <input type="file" id="sceneImgInput" accept="image/*" onchange="onSceneImg(this)" style="display:none">
+                  <img id="sceneImgPreview" class="img-upload-preview">
+                  <div id="sceneImgTxt">
+                    <div style="font-size:20px;margin-bottom:6px">◎</div>
+                    <div style="font-size:12px;color:var(--textmut)">Upload image to animate</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prompt -->
+              <div class="panel-ttl">Scene Prompt</div>
+              <textarea class="prompt-ta" id="scenePrompt" style="min-height:120px;margin-bottom:12px" placeholder="POV: You're sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book and holds your gaze for a moment..."></textarea>
+
+              <button class="btn-purple" onclick="generateScene()" id="sceneBtn" style="width:100%">
+                ▶ Generate Scene
+              </button>
+            </div>
+
+            <!-- Scene results -->
+            <div id="sceneResults" style="display:none">
+              <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--white);margin-bottom:12px">Generated Scenes</div>
+              <div class="scene-results" id="sceneGrid"></div>
+            </div>
+          </div>
+
+          <div class="scene-right">
+            <div class="panel-card">
+              <div class="panel-ttl">Video Settings</div>
+              <label class="s-lbl">Duration</label>
+              <select class="s-sel" id="sceneDuration"><option value="5">5 seconds</option><option value="10" selected>10 seconds</option></select>
+              <label class="s-lbl">Aspect Ratio</label>
+              <select class="s-sel" id="sceneAspect"><option value="9:16" selected>Portrait 9:16 — Stories</option><option value="16:9">Landscape 16:9 — Cinematic</option><option value="1:1">Square 1:1</option></select>
+              <label class="s-lbl">Quality</label>
+              <select class="s-sel" style="margin:0"><option selected>Standard — Kling 2.1</option></select>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-ttl">Prompt Starters</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('pov-cafe')">☕ POV café moment</button>
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('rain-window')">🌧 Rain on window</button>
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('city-night')">🌃 City at night</button>
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('phone-pickup')">📱 Phone being picked up</button>
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('door-opens')">🚪 Door opens slowly</button>
+                <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('candles')">🕯 Candlelit room</button>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-ttl">Cost Estimate</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--textmut);line-height:2">
+                <div>Text → Video: ~$0.28–0.56</div>
+                <div>Text → Image: ~$0.04</div>
+                <div>Image → Video: ~$0.28–0.56</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
     <div id="settingsView" style="display:none;height:100%;overflow-y:auto">
       <div class="content">
         <div class="settings-page fade">
           <div class="settings-h">Settings</div>
-          <div class="settings-sub">Your API key is stored securely as an environment variable on the server.</div>
+          <div class="settings-sub">Your API keys are stored securely as environment variables on the server.</div>
           <div class="settings-section">
             <div class="section-h">API Status</div>
-            <div class="section-p">Your Replicate API key is configured on the backend. All generations route through the secure server.</div>
+            <div class="section-p">Both fal.ai and Replicate keys are configured on the backend.</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:9px;margin-bottom:10px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+              <div style="font-size:12px;color:#69f0ae;font-weight:400">FAL_API_KEY configured — images, animation, scenes</div>
+            </div>
             <div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:9px">
               <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
-              <div style="font-size:12px;color:#69f0ae;font-weight:400">REPLICATE_API_TOKEN configured via Vercel environment variables</div>
+              <div style="font-size:12px;color:#69f0ae;font-weight:400">REPLICATE_API_TOKEN configured — LoRA training</div>
             </div>
             <div class="info-grid">
-              <div class="info-box"><div class="info-v">~$0.05</div><div class="info-l">Per image</div></div>
+              <div class="info-box"><div class="info-v">~$0.04</div><div class="info-l">Per image</div></div>
               <div class="info-box"><div class="info-v">~$0.40</div><div class="info-l">Per animation</div></div>
               <div class="info-box"><div class="info-v">~$2</div><div class="info-l">LoRA training</div></div>
             </div>
           </div>
           <div class="settings-section">
             <div class="section-h">Models</div>
-            <div class="section-p">All models run through Replicate — pay per generation, no subscription.</div>
+            <div class="section-p">All models run pay-per-generation — no subscription caps.</div>
             <div class="model-info-grid">
-              <div class="mic"><div class="mic-name">FLUX.1 Pro</div><div class="mic-use">Image generation</div><div class="mic-price">~$0.05 per image</div></div>
-              <div class="mic"><div class="mic-name">Kling 2.1</div><div class="mic-use">Image to Video</div><div class="mic-price">~$0.40 per video</div></div>
+              <div class="mic"><div class="mic-name">Seedream 4.5</div><div class="mic-use">Character images</div><div class="mic-price">~$0.04 per image</div></div>
+              <div class="mic"><div class="mic-name">Kling 2.1</div><div class="mic-use">Image + Text to Video</div><div class="mic-price">~$0.28–0.56 per video</div></div>
               <div class="mic"><div class="mic-name">FLUX LoRA</div><div class="mic-use">Character training</div><div class="mic-price">~$2 per training run</div></div>
-              <div class="mic"><div class="mic-name">Wav2Lip</div><div class="mic-use">Lipsync — coming soon</div><div class="mic-price">~$0.10 per video</div></div>
+              <div class="mic"><div class="mic-name">Instant Character</div><div class="mic-use">Face consistency</div><div class="mic-price">~$0.05 per image</div></div>
             </div>
-          </div>
-          <div class="settings-section">
-            <div class="section-h">Default Settings</div>
-            <div class="section-p">Applied to every generation unless overridden in the studio.</div>
-            <label class="s-lbl">Default image model</label>
-            <select class="s-sel"><option selected>FLUX.1 Pro — best quality</option><option>FLUX.1 Dev — faster, cheaper</option></select>
-            <label class="s-lbl">Default animation model</label>
-            <select class="s-sel"><option selected>Kling 2.1 — cinematic</option><option>Kling 1.6 — faster</option></select>
-            <label class="s-lbl">Default aspect ratio</label>
-            <select class="s-sel" style="margin:0"><option>Portrait 4:5</option><option selected>Portrait 3:4</option><option>Square 1:1</option><option>Story 9:16</option></select>
           </div>
           <div class="settings-section">
             <div class="section-h">Data</div>
@@ -314,7 +455,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 <div class="overlay" id="addModal">
   <div class="modal">
     <div class="modal-h">New Character</div>
-    <div class="modal-p">Upload a reference image and name her. Use @name in prompts to reference her look.</div>
+    <div class="modal-p">Upload a reference image and name her. This photo guides every generation.</div>
     <div class="upload-z">
       <input type="file" class="upload-file" id="fileInp" accept="image/*" onchange="onFile(this)">
       <img class="upload-prev" id="uploadPrev">
@@ -323,7 +464,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
       <div class="upload-hint" id="uploadHint">PNG or JPG · clear face · good lighting</div>
     </div>
     <label class="m-lbl">Character name</label>
-    <input class="m-inp" id="nameInp" placeholder="e.g. Amara, Zara, Nova...">
+    <input class="m-inp" id="nameInp" placeholder="e.g. Amara, Brooke, Carmen...">
     <div class="modal-btns">
       <button class="btn-ghost" onclick="closeAdd()">Cancel</button>
       <button class="btn-blue" onclick="saveChar()">Create character →</button>
@@ -338,12 +479,12 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     <div class="modal-p">Describe the motion. Your image becomes the first frame.</div>
     <div class="notice">
       <div class="notice-i">⬡</div>
-      <div class="notice-t"><strong>Kling 2.1</strong> — ~$0.40 per video, routed through your secure backend.</div>
+      <div class="notice-t"><strong>Kling 2.1</strong> via fal.ai — ~$0.28–0.56 per video.</div>
     </div>
     <label class="m-lbl">Motion prompt</label>
-    <textarea class="m-ta" id="animProm" placeholder="She slowly turns toward camera, hair moving softly in a gentle breeze. Eyes meet the lens with calm confidence. Shallow depth of field. Cinematic, intimate movement."></textarea>
+    <textarea class="m-ta" id="animProm" placeholder="She slowly turns toward camera, hair moving softly in a gentle breeze. Eyes meet the lens with calm confidence. Cinematic, intimate movement."></textarea>
     <div class="two-col">
-      <div><label class="m-lbl">Duration</label><select class="s-sel" id="animDur" style="margin:0"><option>5 seconds</option><option selected>10 seconds</option></select></div>
+      <div><label class="m-lbl">Duration</label><select class="s-sel" id="animDur" style="margin:0"><option value="5">5 seconds</option><option value="10" selected>10 seconds</option></select></div>
       <div><label class="m-lbl">Intensity</label><select class="s-sel" id="animInt" style="margin:0"><option>Subtle</option><option selected>Moderate</option><option>Dynamic</option></select></div>
     </div>
     <div class="modal-btns">
@@ -393,17 +534,24 @@ let animTarget = null;
 let currentLightboxId = null;
 let loraPhotos = [];
 let trainingInterval = null;
+let sceneMode = 'text-to-video';
+let sceneImgUrl = null;
+let sceneItems = JSON.parse(localStorage.getItem('ais4_scenes') || '[]');
 
 renderSidebar();
 
+// ── NAV ──
 function navTo(page) {
-  document.getElementById('tabStudio').classList.toggle('active', page==='studio');
-  document.getElementById('tabSettings').classList.toggle('active', page==='settings');
+  ['tabStudio','tabScene','tabSettings'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('tab' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
   document.getElementById('studioView').style.display = page==='studio' ? 'flex' : 'none';
+  document.getElementById('sceneView').style.display = page==='scene' ? 'flex' : 'none';
   document.getElementById('settingsView').style.display = page==='settings' ? 'block' : 'none';
   document.getElementById('sidebar').style.display = page==='studio' ? 'flex' : 'none';
+  if (page==='scene') renderSceneGallery();
 }
 
+// ── SIDEBAR ──
 function renderSidebar() {
   const el = document.getElementById('charsList');
   if (!el) return;
@@ -448,6 +596,7 @@ function renderCharContent() {
   else renderCharSettings();
 }
 
+// ── GENERATE ──
 function renderGenerate() {
   const c = getChar(); if (!c) return;
   const tag = `@${c.name.toLowerCase().replace(/\s+/g,'_')}`;
@@ -459,7 +608,7 @@ function renderGenerate() {
         ${c.img ? `<img class="hero-img" src="${c.img}">` : `<div class="hero-ph">${c.name[0].toUpperCase()}</div>`}
         <div class="hero-info">
           <div class="hero-name">${c.name}</div>
-          <div class="hero-tag">${tag} ${c.lora_model ? '<span style="font-size:9px;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2);padding:1px 6px;border-radius:3px;margin-left:6px">LoRA trained ✓</span>' : ''}</div>
+          <div class="hero-tag">${tag} ${c.lora_model ? '<span style="font-size:9px;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2);padding:1px 6px;border-radius:3px;margin-left:6px">LoRA ✓</span>' : ''}</div>
           <div class="hero-stats">
             <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='image').length}</div><div class="stat-l">Images</div></div>
             <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='video').length}</div><div class="stat-l">Videos</div></div>
@@ -485,14 +634,7 @@ function renderGenerate() {
     </div>
     <div class="gen-right">
       <div class="panel-card">
-        <div class="panel-ttl">Image Model</div>
-        <div class="model-grid">
-          <button class="m-pill active" onclick="pickPill(this)">FLUX.1 Pro</button>
-          <button class="m-pill" onclick="pickPill(this)">FLUX.1 Dev</button>
-          <button class="m-pill" onclick="pickPill(this)">Seedream 4</button>
-          <button class="m-pill" onclick="pickPill(this)">SDXL</button>
-        </div>
-        <div class="glow-line"></div>
+        <div class="panel-ttl">Settings</div>
         <label class="s-lbl">Aspect ratio</label>
         <select class="s-sel" id="aspectRatio"><option>Portrait 4:5</option><option selected>Portrait 3:4</option><option>Square 1:1</option><option>Story 9:16</option></select>
         <label class="s-lbl">Style preset</label>
@@ -521,7 +663,7 @@ function renderCards(gens) {
   return gens.map(g => `
     <div class="r-card">
       ${g.loading
-        ? `<div class="r-loading"><div class="spin"></div><div class="spin-txt">Generating</div></div>`
+        ? `<div class="r-loading"><div class="spin"></div><div class="spin-txt">${g.type==='video'?'Animating':'Generating'}</div></div>`
         : g.url
           ? g.type==='video'
             ? `<video class="r-vid" src="${g.url}" autoplay muted loop playsinline onclick="openLightbox('${g.id}')"></video>`
@@ -564,11 +706,8 @@ function filterGal(btn, type) {
 function renderCharSettings() {
   const c = getChar();
   const isTraining = c.lora_training_id && !c.lora_model;
-
   document.getElementById('studioContent').innerHTML = `
   <div style="max-width:560px" class="fade">
-
-    <!-- Profile -->
     <div class="settings-section">
       <div class="section-h">Character Profile</div>
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px">
@@ -590,203 +729,190 @@ function renderCharSettings() {
         <button class="btn-ghost" onclick="deleteChar('${c.id}')" style="color:var(--red);border-color:#3a1515">Delete character</button>
       </div>
     </div>
-
-    <!-- LoRA Training -->
     <div class="settings-section">
       <div class="section-h">LoRA Training</div>
-      <div class="section-p">Train a dedicated AI model on ${c.name}'s photos. Once trained, every generation will lock her exact face, skin tone, and hair texture permanently. Train once (~$2), generate forever.</div>
-
+      <div class="section-p">Train a dedicated AI model on ${c.name}'s photos for perfect face consistency. Train once (~$2), generate forever.</div>
       ${c.lora_model ? `
-        <!-- Already trained -->
-        <div class="lora-trained-badge">
-          <div class="lora-trained-dot"></div>
-          <div class="lora-trained-txt">✓ ${c.name}'s LoRA model is trained and active — all generations now use her locked identity</div>
-        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn-ghost" onclick="retrainLora('${c.id}')">Retrain with new photos</button>
-        </div>
+        <div class="lora-trained-badge"><div class="lora-trained-dot"></div><div class="lora-trained-txt">✓ ${c.name}'s LoRA is trained and active</div></div>
+        <button class="btn-ghost" onclick="retrainLora('${c.id}')">Retrain with new photos</button>
       ` : isTraining ? `
-        <!-- Training in progress -->
         <div class="training-progress">
-          <div class="training-status-txt" id="trainingStatusTxt">⟳ Training in progress — this takes 15-25 minutes...</div>
+          <div class="training-status-txt" id="trainingStatusTxt">⟳ Training in progress — 15-25 minutes...</div>
           <div class="training-progress-bar"><div class="training-progress-fill" style="width:60%"></div></div>
-          <div style="font-size:10px;color:var(--textdim);margin-top:6px">Training ID: ${c.lora_training_id}</div>
+          <div style="font-size:10px;color:var(--textdim);margin-top:6px">ID: ${c.lora_training_id}</div>
         </div>
-        <button class="btn-blue" onclick="checkTrainingStatus('${c.id}')" style="margin-bottom:10px">
-          ↻ Check status
-        </button>
+        <button class="btn-blue" onclick="checkTrainingStatus('${c.id}')">↻ Check status</button>
       ` : `
-        <!-- Not trained yet -->
         <div class="notice" style="margin-bottom:16px">
           <div class="notice-i">◈</div>
-          <div class="notice-t">Upload <strong>20+ photos</strong> of ${c.name} — different angles, lighting, expressions. More photos = better consistency. Clear face shots work best.</div>
+          <div class="notice-t">Upload <strong>20+ photos</strong> of ${c.name} — different angles, lighting, expressions.</div>
         </div>
-
         <div class="lora-photos-grid" id="loraPhotosGrid">
           <div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()">
-            <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">
-            +
+            <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">+
           </div>
         </div>
-
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textmut)" id="loraPhotoCount">0 photos selected</div>
           <button class="btn-ghost" style="padding:5px 12px;font-size:11px" onclick="document.getElementById('loraFileInput').click()">+ Add more</button>
         </div>
-
-        <button class="btn-green" onclick="startLoraTraining('${c.id}')" id="trainBtn" disabled style="width:100%">
-          ◈ Start LoRA Training (~$2 · 20 mins)
-        </button>
+        <button class="btn-green" onclick="startLoraTraining('${c.id}')" id="trainBtn" disabled style="width:100%">◈ Start LoRA Training (~$2 · 20 mins)</button>
       `}
     </div>
-
   </div>`;
-
-  // Resume polling if training is in progress
-  if (isTraining) {
-    startTrainingPoll(c.id);
-  }
+  if (isTraining) startTrainingPoll(c.id);
 }
 
-// ── LORA PHOTO HANDLING ──
-function addLoraPhotos(input) {
-  const files = Array.from(input.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      loraPhotos.push(e.target.result);
-      updateLoraGrid();
-    };
-    reader.readAsDataURL(file);
-  });
+// ── SCENE STUDIO ──
+function setSceneMode(mode, btn) {
+  sceneMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sceneImgUpload').style.display = mode === 'image-to-video' ? 'block' : 'none';
 }
 
-function updateLoraGrid() {
-  const grid = document.getElementById('loraPhotosGrid');
-  const count = document.getElementById('loraPhotoCount');
-  const trainBtn = document.getElementById('trainBtn');
-  if (!grid) return;
-
-  const photoHtml = loraPhotos.map((p, i) => `
-    <div style="position:relative">
-      <img src="${p}" class="lora-photo">
-      <button onclick="removeLoraPhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
-    </div>
-  `).join('');
-
-  grid.innerHTML = photoHtml + `
-    <div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()">
-      <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">
-      +
-    </div>`;
-
-  if (count) count.textContent = `${loraPhotos.length} photo${loraPhotos.length===1?'':'s'} selected`;
-  if (trainBtn) {
-    trainBtn.disabled = loraPhotos.length < 5;
-    trainBtn.textContent = loraPhotos.length < 5
-      ? `◈ Need at least 5 photos (${loraPhotos.length} added)`
-      : `◈ Start LoRA Training — ${loraPhotos.length} photos (~$2 · 20 mins)`;
-  }
+function pickSceneType(el, type) {
+  document.querySelectorAll('.scene-type').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const starters = {
+    pov: 'POV: You\'re sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up and holds your gaze for a moment. Soft ambient light. Cinematic.',
+    environment: 'A beautifully lit modern London apartment at golden hour. Floor-to-ceiling windows with city views. Warm tones, minimal furniture, candles on the windowsill. Cinematic, editorial aesthetic.',
+    mood: 'Close-up of rain falling against a dark window at night. City lights blur and refract in the droplets. Slow motion. Moody, introspective. The kind of night you stay inside and overthink everything.',
+    story: 'A notification appears on a sleek iPhone screen on a marble countertop. A hand slowly reaches in and picks up the phone. The screen glows. Fingers hover before opening the message. Cinematic close-up.'
+  };
+  if (starters[type]) document.getElementById('scenePrompt').value = starters[type];
 }
 
-function removeLoraPhoto(index) {
-  loraPhotos.splice(index, 1);
-  updateLoraGrid();
+function onSceneImg(inp) {
+  const file = inp.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const compressed = await compressImage(e.target.result, 1024);
+    sceneImgUrl = compressed;
+    const prev = document.getElementById('sceneImgPreview');
+    prev.src = compressed; prev.style.display = 'block';
+    document.getElementById('sceneImgTxt').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
 }
 
-function retrainLora(charId) {
-  loraPhotos = [];
-  const c = chars.find(x => x.id === charId);
-  if (c) { c.lora_model = null; c.lora_training_id = null; save(); renderCharSettings(); }
+function useStarter(key) {
+  const starters = {
+    'pov-cafe': 'POV: You\'re sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book and holds your gaze. Soft ambient light. Cinematic.',
+    'rain-window': 'Close-up of rain falling against a dark window at night. City lights blur and refract in the droplets. Slow motion. Moody, introspective. The kind of night you stay inside and overthink everything.',
+    'city-night': 'Aerial cinematic shot gliding over London at night. City lights shimmer below. The Thames reflects golden and blue. Slow, smooth camera movement. Atmospheric. Quiet luxury aesthetic.',
+    'phone-pickup': 'A notification appears on a sleek iPhone screen on a marble countertop. A hand slowly reaches in and picks up the phone. The screen glows softly. Fingers hover before opening the message. Cinematic close-up.',
+    'door-opens': 'A sleek apartment door slowly opens from the inside. Warm golden light spills out into a dark hallway. Slow motion. The feeling of someone arriving home. Cinematic, intimate, atmospheric.',
+    'candles': 'A beautifully arranged set of pillar candles burning on a dark marble surface. Flames flicker gently. Warm golden light dances across the surface. Slow motion close-up. Luxury, calm, editorial.'
+  };
+  if (starters[key]) document.getElementById('scenePrompt').value = starters[key];
 }
 
-// ── START LORA TRAINING ──
-async function startLoraTraining(charId) {
-  const c = chars.find(x => x.id === charId);
-  if (!c) return;
-  if (loraPhotos.length < 5) { toast('Add at least 5 photos first'); return; }
+async function generateScene() {
+  const prompt = document.getElementById('scenePrompt')?.value?.trim();
+  if (!prompt) { toast('Write a scene prompt first'); return; }
+  if (sceneMode === 'image-to-video' && !sceneImgUrl) { toast('Upload an image first'); return; }
 
-  const btn = document.getElementById('trainBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Starting training...'; }
+  const btn = document.getElementById('sceneBtn');
+  btn.disabled = true;
+  btn.textContent = sceneMode === 'text-to-image' ? '◎ Generating image...' : '▶ Generating video (~2 mins)...';
 
-  toast('Starting LoRA training — this will take 15-25 minutes');
+  const duration = parseInt(document.getElementById('sceneDuration').value);
+  const aspect = document.getElementById('sceneAspect').value;
+
+  const sceneId = 's' + Date.now();
+  const isVideo = sceneMode !== 'text-to-image';
+  sceneItems.unshift({ id: sceneId, type: isVideo ? 'video' : 'image', prompt, url: null, loading: true, createdAt: Date.now() });
+  saveScenes();
+  renderSceneGallery();
+  document.getElementById('sceneResults').style.display = 'block';
 
   try {
-    const res = await fetch('/api/train', {
+    const res = await fetch('/api/scene', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        images: loraPhotos,
-        character_name: c.name
+        prompt,
+        mode: sceneMode,
+        image_url: sceneImgUrl,
+        duration,
+        aspect_ratio: aspect
       })
     });
-
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Training failed to start');
+    if (!res.ok) throw new Error(data.error || 'Scene generation failed');
 
-    c.lora_training_id = data.training_id;
-    save();
-    loraPhotos = [];
-    renderCharSettings();
-    toast('✦ Training started! Come back in 20 mins to check status');
+    const item = sceneItems.find(s => s.id === sceneId);
+    if (item) { item.url = data.url; item.type = data.type; item.loading = false; saveScenes(); renderSceneGallery(); }
+    toast('✦ Scene generated');
 
   } catch(err) {
-    toast('Training error: ' + (err.message || 'Failed'));
-    if (btn) { btn.disabled = false; btn.textContent = `◈ Start LoRA Training (~$2 · 20 mins)`; }
-  }
-}
-
-// ── CHECK TRAINING STATUS ──
-async function checkTrainingStatus(charId) {
-  const c = chars.find(x => x.id === charId);
-  if (!c?.lora_training_id) return;
-
-  const btn = document.querySelector('[onclick*="checkTrainingStatus"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
-
-  try {
-    const res = await fetch('/api/trainStatus', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ training_id: c.lora_training_id })
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to check status');
-
-    const statusTxt = document.getElementById('trainingStatusTxt');
-
-    if (data.status === 'succeeded' && data.model_id) {
-      c.lora_model = data.model_id;
-      c.lora_training_id = null;
-      save();
-      renderSidebar();
-      renderCharSettings();
-      toast(`✦ ${c.name}'s LoRA training complete! Her face is now locked.`);
-    } else if (data.status === 'failed') {
-      c.lora_training_id = null;
-      save();
-      renderCharSettings();
-      toast('Training failed — try again with more photos');
-    } else {
-      if (statusTxt) statusTxt.textContent = `⟳ Still training (${data.status}) — check again in a few minutes`;
-      if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
-      toast(`Status: ${data.status} — training still in progress`);
-    }
-
-  } catch(err) {
+    const item = sceneItems.find(s => s.id === sceneId);
+    if (item) { item.loading = false; item.error = true; saveScenes(); }
+    renderSceneGallery();
     toast('Error: ' + (err.message || 'Failed'));
-    if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '▶ Generate Scene';
   }
 }
 
-function startTrainingPoll(charId) {
-  if (trainingInterval) clearInterval(trainingInterval);
-  // Auto-check every 2 minutes
-  trainingInterval = setInterval(() => checkTrainingStatus(charId), 120000);
+function renderSceneGallery() {
+  const grid = document.getElementById('sceneGrid');
+  const results = document.getElementById('sceneResults');
+  if (!grid) return;
+  if (!sceneItems.length) { if(results) results.style.display = 'none'; return; }
+  if(results) results.style.display = 'block';
+  grid.innerHTML = sceneItems.map(s => `
+    <div class="scene-card">
+      ${s.loading
+        ? `<div class="scene-loading"><div class="spin"></div><div class="spin-txt">${s.type==='video'?'Generating':'Creating'}</div></div>`
+        : s.url
+          ? s.type === 'video'
+            ? `<video class="scene-vid" src="${s.url}" autoplay muted loop playsinline></video>`
+            : `<img class="scene-img" src="${s.url}">`
+          : `<div class="scene-loading"><div style="color:var(--red);font-size:20px">✕</div><div class="spin-txt">Failed</div></div>`}
+      <span class="r-badge badge-${s.type}" style="top:7px;right:7px">${s.type}</span>
+      <div class="scene-overlay">
+        <button class="r-act" onclick="openSceneLightbox('${s.id}')">⤢ View</button>
+        <button class="r-act" onclick="dlScene('${s.id}')">↓ Save</button>
+        <button class="r-act" onclick="deleteScene('${s.id}')" style="color:#ef5350">✕</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-// ── GENERATE ──
+function openSceneLightbox(id) {
+  const s = sceneItems.find(x => x.id === id);
+  if (!s?.url) return;
+  currentLightboxId = 'scene:' + id;
+  const img = document.getElementById('lightboxImg');
+  const vid = document.getElementById('lightboxVid');
+  if (s.type === 'video') { vid.src = s.url; vid.style.display = 'block'; img.style.display = 'none'; }
+  else { img.src = s.url; img.style.display = 'block'; vid.style.display = 'none'; }
+  document.getElementById('lightboxPrompt').textContent = s.prompt || '';
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function dlScene(id) {
+  const s = sceneItems.find(x => x.id === id);
+  if (!s?.url) return;
+  const a = document.createElement('a'); a.href = s.url; a.download = `scene_${id}`; a.click();
+}
+
+function deleteScene(id) {
+  if (!confirm('Delete this scene?')) return;
+  sceneItems = sceneItems.filter(s => s.id !== id);
+  saveScenes(); renderSceneGallery();
+  toast('Scene deleted');
+}
+
+function saveScenes() {
+  try { localStorage.setItem('ais4_scenes', JSON.stringify(sceneItems)); }
+  catch(e) { toast('Storage limit reached'); }
+}
+
+// ── GENERATE IMAGE ──
 async function doGenerate() {
   const c = getChar();
   const prompt = document.getElementById('promptTa')?.value?.trim();
@@ -803,8 +929,8 @@ async function doGenerate() {
     const aspectMap = { 'Portrait 4:5': '4:5', 'Portrait 3:4': '3:4', 'Square 1:1': '1:1', 'Story 9:16': '9:16' };
     const aspect = aspectMap[aspectEl?.value] || '3:4';
     const body = { prompt, aspect_ratio: aspect };
-if (c.lora_model) body.lora_model = c.lora_model;
-if (c.img && !c.lora_model) body.reference_image = await compressImage(c.img, 512);
+    if (c.lora_model) body.lora_model = c.lora_model;
+    if (c.img && !c.lora_model) body.reference_image = c.img;
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -831,12 +957,13 @@ async function doAnim() {
   const c = getChar();
   const srcGen = (c.gens||[]).find(g => g.id === animTarget);
   const srcUrl = srcGen?.url;
+  if (!srcUrl) { toast('No image URL found'); return; }
   const animId = 'v' + Date.now();
   c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
   save(); closeAnim(); renderGenerate();
-  toast('▶ Animating with Kling 2.1 — this takes ~2 mins...');
+  toast('▶ Animating with Kling 2.1 — takes ~2 mins...');
   try {
-    const dur = document.getElementById('animDur')?.value?.includes('5') ? 5 : 10;
+    const dur = parseInt(document.getElementById('animDur')?.value) || 10;
     const res = await fetch('/api/animate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -907,10 +1034,7 @@ function updateCharImg(inp, id) {
   const reader = new FileReader();
   reader.onload = async e => {
     const c = chars.find(x => x.id === id);
-    if (c) {
-      c.img = await compressImage(e.target.result, 512);
-      save(); renderCharContent(); toast('Reference image updated');
-    }
+    if (c) { c.img = await compressImage(e.target.result, 512); save(); renderCharContent(); toast('Reference image updated'); }
   };
   reader.readAsDataURL(file);
 }
@@ -918,6 +1042,116 @@ function updateCharImg(inp, id) {
 function updateCharName(name, id) {
   const c = chars.find(x => x.id === id);
   if (c && name.trim()) { c.name = name.trim(); save(); renderSidebar(); }
+}
+
+// ── LORA ──
+function addLoraPhotos(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 512;
+        let w = img.width, h = img.height;
+        if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+        else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        loraPhotos.push(canvas.toDataURL('image/jpeg', 0.7));
+        updateLoraGrid();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function updateLoraGrid() {
+  const grid = document.getElementById('loraPhotosGrid');
+  const count = document.getElementById('loraPhotoCount');
+  const trainBtn = document.getElementById('trainBtn');
+  if (!grid) return;
+  const photoHtml = loraPhotos.map((p, i) => `
+    <div style="position:relative">
+      <img src="${p}" class="lora-photo">
+      <button onclick="removeLoraPhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:10px;cursor:pointer;line-height:1">✕</button>
+    </div>`).join('');
+  grid.innerHTML = photoHtml + `<div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()"><input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">+</div>`;
+  if (count) count.textContent = `${loraPhotos.length} photo${loraPhotos.length===1?'':'s'} selected`;
+  if (trainBtn) {
+    trainBtn.disabled = loraPhotos.length < 5;
+    trainBtn.textContent = loraPhotos.length < 5 ? `◈ Need at least 5 photos (${loraPhotos.length} added)` : `◈ Start LoRA Training — ${loraPhotos.length} photos (~$2 · 20 mins)`;
+  }
+}
+
+function removeLoraPhoto(index) { loraPhotos.splice(index, 1); updateLoraGrid(); }
+
+function retrainLora(charId) {
+  loraPhotos = [];
+  const c = chars.find(x => x.id === charId);
+  if (c) { c.lora_model = null; c.lora_training_id = null; save(); renderCharSettings(); }
+}
+
+async function startLoraTraining(charId) {
+  const c = chars.find(x => x.id === charId);
+  if (!c || loraPhotos.length < 5) { toast('Add at least 5 photos first'); return; }
+  const btn = document.getElementById('trainBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting training...'; }
+  toast('Starting LoRA training — 15-25 minutes');
+  try {
+    const res = await fetch('/api/train', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ images: loraPhotos, character_name: c.name })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Training failed to start');
+    c.lora_training_id = data.training_id;
+    save(); loraPhotos = []; renderCharSettings();
+    toast('✦ Training started! Check back in 20 mins');
+  } catch(err) {
+    toast('Training error: ' + (err.message || 'Failed'));
+    if (btn) { btn.disabled = false; btn.textContent = `◈ Start LoRA Training (~$2 · 20 mins)`; }
+  }
+}
+
+async function checkTrainingStatus(charId) {
+  const c = chars.find(x => x.id === charId);
+  if (!c?.lora_training_id) return;
+  const btn = document.querySelector('[onclick*="checkTrainingStatus"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
+  try {
+    const res = await fetch('/api/trainStatus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ training_id: c.lora_training_id })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to check status');
+    if (data.status === 'succeeded' && data.model_id) {
+      c.lora_model = data.model_id; c.lora_training_id = null;
+      save(); renderSidebar(); renderCharSettings();
+      toast(`✦ ${c.name}'s LoRA complete! Her face is now locked.`);
+    } else if (data.status === 'failed') {
+      c.lora_training_id = null; save(); renderCharSettings();
+      toast('Training failed — try again with more photos');
+    } else {
+      const statusTxt = document.getElementById('trainingStatusTxt');
+      if (statusTxt) statusTxt.textContent = `⟳ Still training (${data.status}) — check again soon`;
+      if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
+      toast(`Status: ${data.status} — still in progress`);
+    }
+  } catch(err) {
+    toast('Error: ' + (err.message || 'Failed'));
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
+  }
+}
+
+function startTrainingPoll(charId) {
+  if (trainingInterval) clearInterval(trainingInterval);
+  trainingInterval = setInterval(() => checkTrainingStatus(charId), 120000);
 }
 
 // ── ANIMATE MODAL ──
@@ -941,11 +1175,8 @@ function openLightbox(genId) {
   currentLightboxId = genId;
   const img = document.getElementById('lightboxImg');
   const vid = document.getElementById('lightboxVid');
-  if (g.type === 'video') {
-    vid.src = g.url; vid.style.display = 'block'; img.style.display = 'none';
-  } else {
-    img.src = g.url; img.style.display = 'block'; vid.style.display = 'none';
-  }
+  if (g.type === 'video') { vid.src = g.url; vid.style.display = 'block'; img.style.display = 'none'; }
+  else { img.src = g.url; img.style.display = 'block'; vid.style.display = 'none'; }
   document.getElementById('lightboxPrompt').textContent = g.prompt || '';
   document.getElementById('lightbox').classList.add('open');
 }
@@ -958,17 +1189,20 @@ function closeLightbox() {
 
 function dlFromLightbox() {
   if (!currentLightboxId) return;
+  if (currentLightboxId.startsWith('scene:')) {
+    dlScene(currentLightboxId.replace('scene:',''));
+    return;
+  }
   const c = getChar();
   const g = (c.gens||[]).find(x => x.id === currentLightboxId);
   if (!g?.url) return;
-  const a = document.createElement('a'); a.href = g.url;
-  a.download = `${c.name}_${currentLightboxId}`; a.click();
+  const a = document.createElement('a'); a.href = g.url; a.download = `${c.name}_${currentLightboxId}`; a.click();
 }
 
 function delFromLightbox() {
   if (!currentLightboxId) return;
-  deleteGen(currentLightboxId);
-  closeLightbox();
+  if (currentLightboxId.startsWith('scene:')) { deleteScene(currentLightboxId.replace('scene:','')); closeLightbox(); return; }
+  deleteGen(currentLightboxId); closeLightbox();
 }
 
 function deleteGen(genId) {
@@ -985,25 +1219,18 @@ function pickPill(el) {
   el.classList.add('active');
 }
 
-function dlGen(id) {
-  const c = getChar();
-  const g = (c.gens||[]).find(x => x.id === id);
-  if (!g?.url) { toast('Nothing to download yet'); return; }
-  const a = document.createElement('a'); a.href = g.url;
-  a.download = `${c.name}_${id}`; a.click();
-}
-
 function save() {
   try { localStorage.setItem('ais4_chars', JSON.stringify(chars)); }
   catch(e) { toast('Storage limit — clear old generations'); }
 }
 
 function clearAll() {
-  if (!confirm('Clear all characters and generations?')) return;
+  if (!confirm('Clear all data?')) return;
   localStorage.removeItem('ais4_chars');
-  chars = []; activeId = null; renderSidebar();
+  localStorage.removeItem('ais4_scenes');
+  chars = []; sceneItems = []; activeId = null; renderSidebar();
   document.getElementById('charTabs').style.display = 'none';
-  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio cleared</div><div class="empty-p">Start fresh — add your first character.</div></div>`;
+  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio cleared</div><div class="empty-p">Start fresh.</div></div>`;
   toast('All data cleared');
 }
 
@@ -1019,33 +1246,5 @@ document.addEventListener('keydown', e => {
 </script>
 </body>
 </html>
-function compressImage(base64, maxSize) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
-      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
-    };
-    img.src = base64;
-  });
-}
-function compressImage(base64, maxSize) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
-      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
-    };
-    img.src = base64;
-  });
-}
+ENDOFFILE
+echo "Done"
