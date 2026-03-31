@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const FormData = require('form-data');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -12,7 +11,31 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Please upload at least 5 photos' });
     }
 
-    // Upload each image to Replicate's file storage
+    const modelName = character_name.toLowerCase().replace(/[^a-z0-9-]/g, '-') + '-lora';
+
+    // Step 1 — Auto create the model repo on Replicate
+    const createRes = await fetch('https://api.replicate.com/v1/models', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        owner: 'wcpilot7',
+        name: modelName,
+        description: `LoRA model for ${character_name} — AI Studio`,
+        visibility: 'private',
+        hardware: 'gpu-a40-large'
+      })
+    });
+
+    // Model might already exist — that's fine, continue either way
+    const createData = await createRes.json();
+    if (!createRes.ok && !createData.detail?.includes('already exists')) {
+      throw new Error(createData.detail || 'Failed to create model repo');
+    }
+
+    // Step 2 — Upload each photo to Replicate file storage
     const uploadedUrls = [];
     for (const base64img of images) {
       const base64Data = base64img.split(',')[1];
@@ -34,16 +57,15 @@ module.exports = async (req, res) => {
       uploadedUrls.push(uploadData.urls.get);
     }
 
-    // Create a zip URL string Replicate can use
-    // Start FLUX LoRA training with uploaded image URLs
-    const response = await fetch('https://api.replicate.com/v1/trainings', {
+    // Step 3 — Start FLUX LoRA training
+    const trainRes = await fetch('https://api.replicate.com/v1/trainings', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        destination: `wcpilot7/${character_name.toLowerCase().replace(/[^a-z0-9-]/g, '-')}-lora`,
+        destination: `wcpilot7/${modelName}`,
         input: {
           input_images: uploadedUrls.join('\n'),
           steps: 1000,
@@ -58,12 +80,13 @@ module.exports = async (req, res) => {
       })
     });
 
-    const data = await response.json();
-    if (!response.ok) return res.status(400).json({ error: data.detail || 'Training failed to start' });
+    const trainData = await trainRes.json();
+    if (!trainRes.ok) return res.status(400).json({ error: trainData.detail || 'Training failed to start' });
 
     return res.json({
-      training_id: data.id,
-      status: data.status
+      training_id: trainData.id,
+      status: trainData.status,
+      model_name: modelName
     });
 
   } catch(err) {
