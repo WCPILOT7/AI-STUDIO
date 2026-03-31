@@ -7,52 +7,31 @@ module.exports = async (req, res) => {
     const { prompt, aspect_ratio, reference_image, lora_model } = req.body;
     const key = process.env.REPLICATE_API_TOKEN;
 
-    let predictionUrl;
-    let requestBody;
+    let predictionUrl = 'https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions';
+    let input = {
+      prompt,
+      aspect_ratio: aspect_ratio || '3:4',
+      output_format: 'jpg',
+      output_quality: 90,
+      safety_tolerance: 2
+    };
 
     if (lora_model) {
-      // Use trained LoRA model if available
-      predictionUrl = 'https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions';
-      requestBody = {
-        input: {
-          prompt,
-          aspect_ratio: aspect_ratio || '3:4',
-          output_format: 'jpg',
-          output_quality: 90,
-          safety_tolerance: 2,
-          extra_lora: lora_model,
-          extra_lora_scale: 0.85
-        }
-      };
-    } else if (reference_image) {
-      // Use IP-Adapter for character consistency with reference image
-      predictionUrl = 'https://api.replicate.com/v1/models/zsxkib/flux-pulid/predictions';
-      requestBody = {
-        input: {
-          prompt,
-          main_face_image: reference_image,
-          aspect_ratio: aspect_ratio || '3:4',
-          output_format: 'jpg',
-          output_quality: 90,
-          true_cfg: 4,
-          id_weight: 1.0,
-          num_steps: 20,
-          start_step: 0,
-          num_outputs: 1,
-          guidance_scale: 4
-        }
-      };
-    } else {
-      // Standard FLUX generation
-      predictionUrl = 'https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions';
-      requestBody = {
-        input: {
-          prompt,
-          aspect_ratio: aspect_ratio || '3:4',
-          output_format: 'jpg',
-          output_quality: 90,
-          safety_tolerance: 2
-        }
+      input.extra_lora = lora_model;
+      input.extra_lora_scale = 0.85;
+    }
+
+    if (reference_image && !lora_model) {
+      // Use FLUX Redux for image-guided generation
+      predictionUrl = 'https://api.replicate.com/v1/models/black-forest-labs/flux-redux-dev/predictions';
+      input = {
+        redux_image: reference_image,
+        prompt,
+        aspect_ratio: aspect_ratio || '3:4',
+        output_format: 'jpg',
+        output_quality: 90,
+        guidance: 3.5,
+        num_inference_steps: 28
       };
     }
 
@@ -63,7 +42,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json',
         'Prefer': 'wait'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({ input })
     });
 
     if (!response.ok) {
