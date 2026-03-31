@@ -12,18 +12,19 @@ module.exports = async (req, res) => {
 
     if (reference_image && falKey) {
       // Send base64 directly to fal.ai — no upload needed
-      const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
+      const submitRes = await fetch('https://queue.fal.run/fal-ai/seedream-v4-5', {
         method: 'POST',
         headers: {
           'Authorization': `Key ${falKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          prompt,
-          image_url: reference_image,
-          num_images: 1,
-          guidance_scale: 7
-        })
+       body: JSON.stringify({
+  prompt,
+  image_url: reference_image,
+  num_images: 1,
+  guidance_scale: 7,
+  image_size: 'portrait_3_4'
+})
       });
 
       const submitText = await submitRes.text();
