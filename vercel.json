@@ -1,17 +1,17 @@
 {
   "version": 2,
+  "functions": {
+    "api/train.js": { "maxDuration": 300 },
+    "api/animate.js": { "maxDuration": 300 },
+    "api/scene.js": { "maxDuration": 300 },
+    "api/trainStatus.js": { "maxDuration": 60 }
+  },
   "routes": [
-    {
-      "src": "/api/generate",
-      "dest": "/api/generate.js"
-    },
-    {
-      "src": "/api/animate",
-      "dest": "/api/animate.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/api/generate", "dest": "/api/generate.js" },
+    { "src": "/api/animate", "dest": "/api/animate.js" },
+    { "src": "/api/scene", "dest": "/api/scene.js" },
+    { "src": "/api/train", "dest": "/api/train.js" },
+    { "src": "/api/trainStatus", "dest": "/api/trainStatus.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
