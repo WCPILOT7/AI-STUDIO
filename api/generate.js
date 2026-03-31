@@ -10,76 +10,64 @@ module.exports = async (req, res) => {
 
     let imageUrl = null;
 
-    if (lora_model) {
-      // Use Replicate FLUX with trained LoRA
-      const response = await fetch(
-        'https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${repKey}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'wait'
-          },
-          body: JSON.stringify({
-            input: {
-              prompt,
-              aspect_ratio: aspect_ratio || '3:4',
-              output_format: 'jpg',
-              output_quality: 90,
-              extra_lora: lora_model,
-              extra_lora_scale: 0.85
-            }
-          })
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || 'LoRA generation failed');
-      imageUrl = Array.isArray(data.output) ? data.output[0] : data.output;
-      if (!imageUrl && data.urls?.get) imageUrl = await pollReplicate(data.urls.get, repKey);
+    if (reference_image && falKey) {
+      // Step 1 — Upload reference image to fal storage
+      const base64Data = reference_image.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const mimeType = reference_image.split(';')[0].split(':')[1] || 'image/jpeg';
 
-    } else if (reference_image && falKey) {
-      // Use fal.ai consistent character model
-      const aspectMap = {
-        '4:5': '4:5', '3:4': '3:4', '1:1': '1:1', '9:16': '9:16'
-      };
-      const falAspect = aspectMap[aspect_ratio] || '3:4';
-
-      // Submit to fal.ai
-      const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
-```
-
-And change the poll URLs too — find both instances of:
-```
-fal-ai/consistent-character
-```
-
-Replace both with:
-```
-fal-ai/instant-character
+      const uploadRes = await fetch('https://rest.alpha.fal.ai/storage/upload/initiate', {
         method: 'POST',
         headers: {
           'Authorization': `Key ${falKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-  prompt,
-  reference_image_url: reference_image,
-  num_images: 1,
-  output_format: 'jpeg',
-  aspect_ratio: falAspect
-})
+          content_type: mimeType,
+          file_size: buffer.length
+        })
       });
 
-      const submitData = await submitRes.json();
-      if (!submitRes.ok) throw new Error(submitData.detail || submitData.error || 'fal.ai submission failed');
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadData.detail || 'fal upload initiation failed');
 
-      // Poll fal.ai for result
+      // Upload to the presigned URL
+      await fetch(uploadData.upload_url, {
+        method: 'PUT',
+        headers: { 'Content-Type': mimeType },
+        body: buffer
+      });
+
+      const imageStorageUrl = uploadData.file_url;
+
+      // Step 2 — Submit to instant-character
+      const submitRes = await fetch('https://queue.fal.run/fal-ai/instant-character', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${falKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt,
+          image_url: imageStorageUrl,
+          num_images: 1,
+          guidance_scale: 7
+        })
+      });
+
+      if (!submitRes.ok) {
+        const errText = await submitRes.text();
+        throw new Error(errText || 'fal submission failed');
+      }
+
+      const submitData = await submitRes.json();
       const requestId = submitData.request_id;
-      imageUrl = await pollFal(requestId, falKey);
+
+      // Step 3 — Poll for result
+      imageUrl = await pollFal('fal-ai/instant-character', requestId, falKey);
 
     } else {
-      // Standard FLUX generation fallback
+      // Standard FLUX fallback
       const response = await fetch(
         'https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions',
         {
@@ -114,17 +102,17 @@ fal-ai/instant-character
   }
 };
 
-async function pollFal(requestId, key, max = 60) {
+async function pollFal(endpoint, requestId, key, max = 60) {
   for (let i = 0; i < max; i++) {
     await new Promise(r => setTimeout(r, 3000));
     const res = await fetch(
-      `https://queue.fal.run/fal-ai/consistent-character/requests/${requestId}/status`,
+      `https://queue.fal.run/${endpoint}/requests/${requestId}/status`,
       { headers: { 'Authorization': `Key ${key}` } }
     );
     const data = await res.json();
     if (data.status === 'COMPLETED') {
       const resultRes = await fetch(
-        `https://queue.fal.run/fal-ai/consistent-character/requests/${requestId}`,
+        `https://queue.fal.run/${endpoint}/requests/${requestId}`,
         { headers: { 'Authorization': `Key ${key}` } }
       );
       const result = await resultRes.json();
