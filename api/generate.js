@@ -12,18 +12,16 @@ module.exports = async (req, res) => {
 
     if (reference_image && falKey) {
       // Send base64 directly to fal.ai — no upload needed
-      const submitRes = await fetch('https://queue.fal.run/fal-ai/seedream-v4-5', {
+      const submitRes = await fetch('https://queue.fal.run/fal-ai/bytedance/seedream/v4.5/edit', {
         method: 'POST',
         headers: {
           'Authorization': `Key ${falKey}`,
           'Content-Type': 'application/json'
         },
-       body: JSON.stringify({
+      body: JSON.stringify({
   prompt,
-  image_url: reference_image,
-  num_images: 1,
-  guidance_scale: 7,
-  image_size: 'portrait_3_4'
+  image_urls: [reference_image],
+  num_images: 1
 })
       });
 
