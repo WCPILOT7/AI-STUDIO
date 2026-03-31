@@ -14,24 +14,23 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        prompt,
-        image_url,
-        duration: '10',
-        aspect_ratio: '16:9'
+        input: {
+          prompt,
+          image_url,
+          duration: duration === 5 ? '5' : '10',
+          negative_prompt: 'blur, distortion, watermark, low quality'
+        }
       })
     });
 
     const submitText = await submitRes.text();
-    console.log('Submit response:', submitText.slice(0, 500));
-
     let submitData;
     try { submitData = JSON.parse(submitText); }
-    catch(e) { throw new Error('Submit parse failed: ' + submitText.slice(0, 300)); }
-
+    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 300)); }
     if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || JSON.stringify(submitData).slice(0, 200));
 
     const requestId = submitData.request_id;
-    if (!requestId) throw new Error('No request_id returned: ' + JSON.stringify(submitData));
+    if (!requestId) throw new Error('No request_id: ' + JSON.stringify(submitData));
 
     const videoUrl = await pollFal('fal-ai/kling-video/v2.1/standard/image-to-video', requestId, falKey);
     return res.json({ url: videoUrl });
@@ -52,13 +51,8 @@ async function pollFal(endpoint, requestId, key, max = 90) {
       );
       const text = await res.text();
       if (!text || text.trim() === '') continue;
-
       let data;
-      try { data = JSON.parse(text); }
-      catch(e) { continue; }
-
-      console.log('Poll status:', data.status);
-
+      try { data = JSON.parse(text); } catch(e) { continue; }
       if (data.status === 'COMPLETED') {
         const resultRes = await fetch(
           `https://queue.fal.run/${endpoint}/requests/${requestId}`,
@@ -66,8 +60,7 @@ async function pollFal(endpoint, requestId, key, max = 90) {
         );
         const resultText = await resultRes.text();
         let result;
-        try { result = JSON.parse(resultText); }
-        catch(e) { throw new Error('Result parse failed: ' + resultText.slice(0, 200)); }
+        try { result = JSON.parse(resultText); } catch(e) { throw new Error('Result parse failed: ' + resultText.slice(0,200)); }
         return result.video?.url || result.videos?.[0]?.url || null;
       }
       if (data.status === 'FAILED') throw new Error(data.error || data.detail || 'Animation failed');
@@ -76,5 +69,5 @@ async function pollFal(endpoint, requestId, key, max = 90) {
       continue;
     }
   }
-  throw new Error('Animation timed out after 7.5 minutes');
+  throw new Error('Animation timed out');
 }
