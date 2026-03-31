@@ -788,7 +788,7 @@ async function doGenerate() {
     const aspect = aspectMap[aspectEl?.value] || '3:4';
     const body = { prompt, aspect_ratio: aspect };
 if (c.lora_model) body.lora_model = c.lora_model;
-if (c.img && !c.lora_model) body.reference_image = c.img;
+if (c.img && !c.lora_model) body.reference_image = await compressImage(c.img, 512);
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -999,3 +999,18 @@ document.addEventListener('keydown', e => {
 </script>
 </body>
 </html>
+function compressImage(base64, maxSize) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = base64;
+  });
+}
