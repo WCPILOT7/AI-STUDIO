@@ -1234,10 +1234,10 @@ function clearAll() {
   toast('All data cleared');
 }
 
-function toast(msg) {
+function toast(msg, duration = 3500) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
-  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 3500);
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), duration);
 }
 
 document.addEventListener('keydown', e => {
