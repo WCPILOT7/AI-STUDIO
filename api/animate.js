@@ -7,6 +7,9 @@ module.exports = async (req, res) => {
     const { prompt, image_url, duration } = req.body;
     const falKey = process.env.FAL_API_KEY;
 
+    if (!falKey) throw new Error('FAL_API_KEY not configured');
+    if (!image_url) throw new Error('No image URL provided');
+
     const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
       method: 'POST',
       headers: {
@@ -14,25 +17,27 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        input: {
-          prompt,
-          image_url,
-          duration: duration === 5 ? '5' : '10',
-          negative_prompt: 'blur, distortion, watermark, low quality'
-        }
+        prompt,
+        image_url,
+        duration: String(duration || 10),
+        negative_prompt: 'blur, distortion, watermark, low quality'
       })
     });
 
     const submitText = await submitRes.text();
+    console.log('Kling submit response:', submitText.slice(0, 500));
+
     let submitData;
     try { submitData = JSON.parse(submitText); }
-    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 300)); }
+    catch(e) { throw new Error('Submit parse failed: ' + submitText.slice(0, 300)); }
+
     if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || JSON.stringify(submitData).slice(0, 200));
 
     const requestId = submitData.request_id;
-    if (!requestId) throw new Error('No request_id: ' + JSON.stringify(submitData));
+    if (!requestId) throw new Error('No request_id returned: ' + JSON.stringify(submitData));
 
     const videoUrl = await pollFal('fal-ai/kling-video/v2.1/standard/image-to-video', requestId, falKey);
+    if (!videoUrl) throw new Error('No video URL in result');
     return res.json({ url: videoUrl });
 
   } catch(err) {
@@ -60,14 +65,15 @@ async function pollFal(endpoint, requestId, key, max = 90) {
         );
         const resultText = await resultRes.text();
         let result;
-        try { result = JSON.parse(resultText); } catch(e) { throw new Error('Result parse failed: ' + resultText.slice(0,200)); }
+        try { result = JSON.parse(resultText); }
+        catch(e) { throw new Error('Result parse failed: ' + resultText.slice(0, 200)); }
         return result.video?.url || result.videos?.[0]?.url || null;
       }
-      if (data.status === 'FAILED') throw new Error(data.error || data.detail || 'Animation failed');
+      if (data.status === 'FAILED') throw new Error(data.error || data.detail || 'Kling animation failed');
     } catch(e) {
       if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
       continue;
     }
   }
-  throw new Error('Animation timed out');
+  throw new Error('Animation timed out after 7.5 minutes');
 }
