@@ -979,7 +979,7 @@ async function doAnim() {
     const g = c2?.gens?.find(x => x.id === animId);
     if (g) { g.loading = false; g.error = true; save(); }
     renderGenerate();
-    toast('Animation error: ' + (err.message || 'Failed'));
+    toast('Animation error: ' + (err.message || 'Failed'), 10000);
   }
 }
 
