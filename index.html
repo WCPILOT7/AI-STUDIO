@@ -850,7 +850,7 @@ async function generateScene() {
     const item = sceneItems.find(s => s.id === sceneId);
     if (item) { item.loading = false; item.error = true; saveScenes(); }
     renderSceneGallery();
-    toast('Error: ' + (err.message || 'Failed'));
+    toast('Error: ' + (err.message || 'Failed'), 10000);
   } finally {
     btn.disabled = false;
     btn.textContent = '▶ Generate Scene';
