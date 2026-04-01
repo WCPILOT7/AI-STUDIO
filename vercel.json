@@ -4,7 +4,8 @@
     "api/train.js": { "maxDuration": 300 },
     "api/animate.js": { "maxDuration": 300 },
     "api/scene.js": { "maxDuration": 300 },
-    "api/trainStatus.js": { "maxDuration": 60 }
+    "api/trainStatus.js": { "maxDuration": 60 },
+    "api/test.js": { "maxDuration": 30 }
   },
   "routes": [
     { "src": "/api/generate", "dest": "/api/generate.js" },
@@ -12,6 +13,7 @@
     { "src": "/api/scene", "dest": "/api/scene.js" },
     { "src": "/api/train", "dest": "/api/train.js" },
     { "src": "/api/trainStatus", "dest": "/api/trainStatus.js" },
+    { "src": "/api/test", "dest": "/api/test.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
