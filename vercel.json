@@ -19,4 +19,4 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
-
+{ "src": "/api/falkey", "dest": "/api/falkey.js" },
