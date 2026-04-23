@@ -1022,7 +1022,11 @@ async function pollFalDirect(requestId, falKey, max = 60) {
   }
   throw new Error('Animation timed out');
 }
-
+function openAdd() {
+  pendingImg = null;
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('nameInp').focus(), 100);
+}
 // ── CHARACTER CRUD ──
 function openAdd() {
   pendingImg = null;
