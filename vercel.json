@@ -14,8 +14,9 @@
     { "src": "/api/scene", "dest": "/api/scene.js" },
     { "src": "/api/train", "dest": "/api/train.js" },
     { "src": "/api/trainStatus", "dest": "/api/trainStatus.js" },
+    { "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
     { "src": "/api/test", "dest": "/api/test.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
-{ "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
+
