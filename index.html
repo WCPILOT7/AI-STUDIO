@@ -970,10 +970,13 @@ async function doAnim() {
       body: JSON.stringify({ prompt, image_url: srcUrl, duration: dur })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Animation failed');
+    if (!res.ok) throw new Error(data.error || 'Animation failed to start');
+    if (!data.request_id) throw new Error('No request ID returned');
+    toast('▶ Animation queued — checking progress...');
+    const videoUrl = await pollAnimStatus(data.request_id);
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === animId);
-    if (g) { g.url = data.url; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete'); }
+    if (g) { g.url = videoUrl; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete!'); }
   } catch(err) {
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === animId);
@@ -982,6 +985,29 @@ async function doAnim() {
     toast('Animation error: ' + (err.message || 'Failed'), 10000);
   }
 }
+
+async function pollAnimStatus(requestId, maxAttempts = 60) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    try {
+      const res = await fetch('/api/animateStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId })
+      });
+      const data = await res.json();
+      if (data.status === 'completed' && data.url) return data.url;
+      if (data.status === 'failed') throw new Error(data.error || 'Animation failed');
+      if (data.queue_position !== undefined) toast(`▶ Animating — queue position ${data.queue_position}...`);
+    } catch(e) {
+      if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
+      continue;
+    }
+  }
+  throw new Error('Animation timed out after 5 minutes');
+}
+
+function openAdd() {
 
 // ── CHARACTER CRUD ──
 function openAdd() {
