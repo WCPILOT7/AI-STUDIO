@@ -18,3 +18,4 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
+{ "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
