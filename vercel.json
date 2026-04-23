@@ -1,10 +1,11 @@
 {
   "version": 2,
   "functions": {
-    "api/train.js": { "maxDuration": 300 },
     "api/animate.js": { "maxDuration": 300 },
     "api/scene.js": { "maxDuration": 300 },
+    "api/train.js": { "maxDuration": 300 },
     "api/trainStatus.js": { "maxDuration": 60 },
+    "api/generate.js": { "maxDuration": 60 },
     "api/test.js": { "maxDuration": 30 }
   },
   "routes": [
