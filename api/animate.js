@@ -10,8 +10,7 @@ module.exports = async (req, res) => {
     if (!falKey) throw new Error('FAL_API_KEY not configured');
     if (!image_url) throw new Error('No image URL provided');
 
-    // Use synchronous fal.run endpoint instead of queue
-    const response = await fetch('https://fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
+    const response = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falKey}`,
@@ -26,19 +25,15 @@ module.exports = async (req, res) => {
     });
 
     const text = await response.text();
-    console.log('Kling response status:', response.status);
-    console.log('Kling response body:', text.slice(0, 500));
-
     let data;
     try { data = JSON.parse(text); }
     catch(e) { throw new Error('Parse failed: ' + text.slice(0, 300)); }
 
-    if (!response.ok) throw new Error(data.detail || data.message || data.error || text.slice(0, 200));
+    if (!response.ok) throw new Error(data.detail || data.message || text.slice(0, 200));
+    if (!data.request_id) throw new Error('No request_id: ' + text.slice(0, 200));
 
-    const videoUrl = data.video?.url || data.videos?.[0]?.url || null;
-    if (!videoUrl) throw new Error('No video URL in response: ' + JSON.stringify(data).slice(0, 200));
-
-    return res.json({ url: videoUrl });
+    // Return request_id immediately — frontend will poll
+    return res.json({ request_id: data.request_id, status: 'queued' });
 
   } catch(err) {
     console.error('Animate error:', err.message);
