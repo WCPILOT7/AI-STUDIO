@@ -961,19 +961,26 @@ async function doAnim() {
   const animId = 'v' + Date.now();
   c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
   save(); closeAnim(); renderGenerate();
-  toast('▶ Animating with Kling 2.1 — takes ~2 mins...');
+  toast('▶ Submitting to Kling 2.1...');
   try {
     const dur = parseInt(document.getElementById('animDur')?.value) || 10;
-    const res = await fetch('/api/animate', {
+    const keyRes = await fetch('/api/falkey');
+    const keyData = await keyRes.json();
+    if (!keyData.key) throw new Error('Could not get API key');
+    const falKey = keyData.key;
+    const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_url: srcUrl, duration: dur })
+      headers: { 'Authorization': `Key ${falKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, image_url: srcUrl, duration: String(dur), negative_prompt: 'blur, distortion, watermark, low quality' })
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Animation failed to start');
-    if (!data.request_id) throw new Error('No request ID returned');
-    toast('▶ Animation queued — checking progress...');
-    const videoUrl = await pollAnimStatus(data.request_id);
+    const submitText = await submitRes.text();
+    let submitData;
+    try { submitData = JSON.parse(submitText); }
+    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 200)); }
+    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || 'Submission failed');
+    if (!submitData.request_id) throw new Error('No request ID returned');
+    toast('▶ Animation queued — polling for result...');
+    const videoUrl = await pollFalDirect(submitData.request_id, falKey);
     const c2 = getChar();
     const g = c2?.gens?.find(x => x.id === animId);
     if (g) { g.url = videoUrl; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete!'); }
@@ -986,25 +993,34 @@ async function doAnim() {
   }
 }
 
-async function pollAnimStatus(requestId, maxAttempts = 60) {
-  for (let i = 0; i < maxAttempts; i++) {
+async function pollFalDirect(requestId, falKey, max = 60) {
+  for (let i = 0; i < max; i++) {
     await new Promise(r => setTimeout(r, 5000));
     try {
-      const res = await fetch('/api/animateStatus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: requestId })
-      });
-      const data = await res.json();
-      if (data.status === 'completed' && data.url) return data.url;
-      if (data.status === 'failed') throw new Error(data.error || 'Animation failed');
-      if (data.queue_position !== undefined) toast(`▶ Animating — queue position ${data.queue_position}...`);
+      const res = await fetch(
+        `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}/status`,
+        { headers: { 'Authorization': `Key ${falKey}` } }
+      );
+      const text = await res.text();
+      if (!text || text.trim() === '') continue;
+      let data;
+      try { data = JSON.parse(text); } catch(e) { continue; }
+      if (data.status === 'COMPLETED') {
+        const resultRes = await fetch(
+          `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}`,
+          { headers: { 'Authorization': `Key ${falKey}` } }
+        );
+        const result = JSON.parse(await resultRes.text());
+        return result.video?.url || result.videos?.[0]?.url || null;
+      }
+      if (data.status === 'FAILED') throw new Error('Animation failed');
+      if (data.queue_position !== undefined) toast(`▶ Queue position: ${data.queue_position}...`);
     } catch(e) {
       if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
       continue;
     }
   }
-  throw new Error('Animation timed out after 5 minutes');
+  throw new Error('Animation timed out');
 }
 
 function openAdd() {
