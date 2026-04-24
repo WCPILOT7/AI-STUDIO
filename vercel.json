@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": ".",
   "functions": {
     "api/animate.js": { "maxDuration": 300 },
     "api/animateStatus.js": { "maxDuration": 60 },
