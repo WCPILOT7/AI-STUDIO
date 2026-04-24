@@ -2,21 +2,23 @@
   "version": 2,
   "functions": {
     "api/animate.js": { "maxDuration": 300 },
+    "api/animateStatus.js": { "maxDuration": 60 },
     "api/scene.js": { "maxDuration": 300 },
     "api/train.js": { "maxDuration": 300 },
     "api/trainStatus.js": { "maxDuration": 60 },
     "api/generate.js": { "maxDuration": 60 },
+    "api/falkey.js": { "maxDuration": 10 },
     "api/test.js": { "maxDuration": 30 }
   },
   "routes": [
     { "src": "/api/generate", "dest": "/api/generate.js" },
     { "src": "/api/animate", "dest": "/api/animate.js" },
+    { "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
     { "src": "/api/scene", "dest": "/api/scene.js" },
     { "src": "/api/train", "dest": "/api/train.js" },
     { "src": "/api/trainStatus", "dest": "/api/trainStatus.js" },
-    { "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
+    { "src": "/api/falkey", "dest": "/api/falkey.js" },
     { "src": "/api/test", "dest": "/api/test.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
-{ "src": "/api/falkey", "dest": "/api/falkey.js" },
