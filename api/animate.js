@@ -10,7 +10,8 @@ module.exports = async (req, res) => {
     if (!falKey) throw new Error('FAL_API_KEY not configured');
     if (!image_url) throw new Error('No image URL provided');
 
-    const response = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
+    // Submit to Kling
+    const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falKey}`,
@@ -24,19 +25,48 @@ module.exports = async (req, res) => {
       })
     });
 
-    const text = await response.text();
-    let data;
-    try { data = JSON.parse(text); }
-    catch(e) { throw new Error('Parse failed: ' + text.slice(0, 300)); }
+    const submitText = await submitRes.text();
+    let submitData;
+    try { submitData = JSON.parse(submitText); }
+    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 200)); }
+    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || 'Submission failed');
+    if (!submitData.request_id) throw new Error('No request ID');
 
-    if (!response.ok) throw new Error(data.detail || data.message || text.slice(0, 200));
-    if (!data.request_id) throw new Error('No request_id: ' + text.slice(0, 200));
+    const requestId = submitData.request_id;
 
-    // Return request_id immediately — frontend will poll
-    return res.json({ request_id: data.request_id, status: 'queued' });
+    // Poll from backend
+    for (let i = 0; i < 50; i++) {
+      await new Promise(r => setTimeout(r, 6000));
+      
+      const statusRes = await fetch(
+        `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}/status`,
+        { headers: { 'Authorization': `Key ${falKey}` } }
+      );
+      
+      const statusText = await statusRes.text();
+      if (!statusText || statusText.trim() === '') continue;
+      
+      let statusData;
+      try { statusData = JSON.parse(statusText); }
+      catch(e) { continue; }
+
+      if (statusData.status === 'COMPLETED') {
+        const resultRes = await fetch(
+          `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}`,
+          { headers: { 'Authorization': `Key ${falKey}` } }
+        );
+        const result = JSON.parse(await resultRes.text());
+        const videoUrl = result.video?.url || result.videos?.[0]?.url || null;
+        return res.json({ url: videoUrl });
+      }
+
+      if (statusData.status === 'FAILED') throw new Error('Animation failed on fal.ai');
+    }
+
+    throw new Error('Animation timed out');
 
   } catch(err) {
     console.error('Animate error:', err.message);
-    return res.status(500).json({ error: err.message || String(err) });
+    return res.status(500).json({ error: err.message });
   }
 };
