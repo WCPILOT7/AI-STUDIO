@@ -1273,6 +1273,28 @@ function toast(msg, duration = 3500) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeAdd(); closeAnim(); closeLightbox(); }
 });
+  <script>
+pollFalDirect = async function(requestId, falKey, max = 60) {
+  for (let i = 0; i < max; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    try {
+      const res = await fetch('/api/animateStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId })
+      });
+      const data = await res.json();
+      if (data.status === 'completed' && data.url) return data.url;
+      if (data.status === 'failed') throw new Error(data.error || 'Animation failed');
+      if (data.queue_position !== undefined) toast('Queue position: ' + data.queue_position);
+    } catch(e) {
+      if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
+      continue;
+    }
+  }
+  throw new Error('Animation timed out');
+};
+</script>
 </script>
 </body>
 </html>
