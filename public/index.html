@@ -1255,26 +1255,38 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeAdd(); closeAnim(); closeLightbox(); }
 });
   <script>
-pollFalDirect = async function(requestId, falKey, max = 60) {
-  for (let i = 0; i < max; i++) {
-    await new Promise(r => setTimeout(r, 5000));
-    try {
-      const res = await fetch('/api/animateStatus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: requestId })
-      });
-      const data = await res.json();
-      if (data.status === 'completed' && data.url) return data.url;
-      if (data.status === 'failed') throw new Error(data.error || 'Animation failed');
-      if (data.queue_position !== undefined) toast('Queue position: ' + data.queue_position);
-    } catch(e) {
-      if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
-      continue;
-    }
+async function doAnim() {
+  const prompt = document.getElementById('animProm')?.value?.trim();
+  if (!prompt) { toast('Describe the motion first'); return; }
+  const c = getChar();
+  const srcGen = (c.gens||[]).find(g => g.id === animTarget);
+  const srcUrl = srcGen?.url;
+  if (!srcUrl) { toast('No image URL found'); return; }
+  const animId = 'v' + Date.now();
+  c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
+  save(); closeAnim(); renderGenerate();
+  toast('▶ Animating with Kling 2.1 — ~2 mins...');
+  try {
+    const dur = parseInt(document.getElementById('animDur')?.value) || 10;
+    const res = await fetch('/api/animate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, image_url: srcUrl, duration: dur })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Animation failed');
+    if (!data.url) throw new Error('No video URL returned');
+    const c2 = getChar();
+    const g = c2?.gens?.find(x => x.id === animId);
+    if (g) { g.url = data.url; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete!'); }
+  } catch(err) {
+    const c2 = getChar();
+    const g = c2?.gens?.find(x => x.id === animId);
+    if (g) { g.loading = false; g.error = true; save(); }
+    renderGenerate();
+    toast('Animation error: ' + (err.message || 'Failed'), 10000);
   }
-  throw new Error('Animation timed out');
-};
+}
 </script>
 </script>
 </body>
