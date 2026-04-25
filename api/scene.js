@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 
     if (mode === 'text-to-video') {
       // Direct text to video via Kling
-      const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/text-to-video', {
+      const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/pro/text-to-video', {
         method: 'POST',
         headers: { 'Authorization': `Key ${falKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
