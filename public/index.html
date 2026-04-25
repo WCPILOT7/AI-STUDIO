@@ -952,44 +952,78 @@ async function doGenerate() {
 
 // ── ANIMATE ──
 async function doAnim() {
-  const prompt = document.getElementById('animProm')?.value?.trim();
-  if (!prompt) { toast('Describe the motion first'); return; }
-  const c = getChar();
-  const srcGen = (c.gens||[]).find(g => g.id === animTarget);
-  const srcUrl = srcGen?.url;
-  if (!srcUrl) { toast('No image URL found'); return; }
-  const animId = 'v' + Date.now();
-  c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
-  save(); closeAnim(); renderGenerate();
-  toast('▶ Submitting to Kling 2.1...');
+  const prompt = document.getElementById('animProm').value.trim();
+  const duration = document.getElementById('animDur').value;
+  if (!prompt) return showToast('Add a motion prompt first');
+  if (!animTargetImg) return showToast('No image selected');
+
+  closeAnim();
+
+  // Add a spinner card to the gallery right away
+  const char = chars[activeChar];
+  char.gallery = char.gallery || [];
+  const loadingId = 'anim_' + Date.now();
+  char.gallery.unshift({ id: loadingId, type: 'video', loading: true, prompt });
+  saveChars();
+  renderGallery();
+
+  showToast('⬡ Submitting to Kling...');
+
   try {
-    const dur = parseInt(document.getElementById('animDur')?.value) || 10;
-    const keyRes = await fetch('/api/falkey');
-    const keyData = await keyRes.json();
-    if (!keyData.key) throw new Error('Could not get API key');
-    const falKey = keyData.key;
-    const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
+    // Step 1: submit — returns in under 1 second
+    const submitRes = await fetch('/api/animate', {
       method: 'POST',
-      headers: { 'Authorization': `Key ${falKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_url: srcUrl, duration: String(dur), negative_prompt: 'blur, distortion, watermark, low quality' })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: animTargetImg, prompt, duration })
     });
-    const submitText = await submitRes.text();
-    let submitData;
-    try { submitData = JSON.parse(submitText); }
-    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 200)); }
-    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || 'Submission failed');
-    if (!submitData.request_id) throw new Error('No request ID returned');
-    toast('▶ Animation queued — polling for result...');
-    const videoUrl = await pollFalDirect(submitData.request_id, falKey);
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === animId);
-    if (g) { g.url = videoUrl; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete!'); }
+    const submitData = await submitRes.json();
+    if (!submitData.requestId) throw new Error(submitData.error || 'No requestId returned');
+
+    showToast('⬡ Generating... (~2 min)');
+
+    // Step 2: poll every 8 seconds from the browser
+    const requestId = submitData.requestId;
+    let attempts = 0;
+
+    const poll = setInterval(async () => {
+      attempts++;
+      if (attempts > 25) {
+        clearInterval(poll);
+        showToast('⚠ Timed out — check fal.ai dashboard');
+        const idx = char.gallery.findIndex(g => g.id === loadingId);
+        if (idx !== -1) { char.gallery[idx].loading = false; char.gallery[idx].error = true; }
+        saveChars(); renderGallery();
+        return;
+      }
+
+      try {
+        const statusRes = await fetch(`/api/animateStatus?requestId=${requestId}`);
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'COMPLETED' && statusData.videoUrl) {
+          clearInterval(poll);
+          const idx = char.gallery.findIndex(g => g.id === loadingId);
+          if (idx !== -1) {
+            char.gallery[idx] = { id: loadingId, type: 'video', url: statusData.videoUrl, prompt, ts: Date.now() };
+          }
+          saveChars(); renderGallery();
+          showToast('✓ Animation ready');
+
+        } else if (statusData.status === 'FAILED') {
+          clearInterval(poll);
+          const idx = char.gallery.findIndex(g => g.id === loadingId);
+          if (idx !== -1) { char.gallery[idx].loading = false; char.gallery[idx].error = true; }
+          saveChars(); renderGallery();
+          showToast('✗ Animation failed on fal.ai');
+        }
+      } catch(e) { console.warn('Poll error:', e); }
+
+    }, 8000);
+
   } catch(err) {
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === animId);
-    if (g) { g.loading = false; g.error = true; save(); }
-    renderGenerate();
-    toast('Animation error: ' + (err.message || 'Failed'), 10000);
+    showToast('✗ ' + err.message);
+    char.gallery = char.gallery.filter(g => g.id !== loadingId);
+    saveChars(); renderGallery();
   }
 }
 
