@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     if (!imageUrl) throw new Error('No image URL provided');
     if (!prompt) throw new Error('No prompt provided');
 
-    const response = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
+    const response = await fetch('https://queue.fal.run/fal-ai/kling-video/v3/standard/image-to-video', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falKey}`,
@@ -19,9 +19,10 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         prompt,
-        image_url: imageUrl,
-        duration: String(duration || '10'),
-        negative_prompt: 'blur, distortion, watermark, low quality'
+        start_image_url: imageUrl,
+        duration: String(duration || '5'),
+        negative_prompt: 'blur, distortion, watermark, low quality',
+        aspect_ratio: '9:16'
       })
     });
 
