@@ -7,6 +7,7 @@
     "api/trainStatus.js": { "maxDuration": 60 },
     "api/animateStatus.js": { "maxDuration": 15 },
     "api/falkey.js": { "maxDuration": 10 },
+    "api/upload.js": { "maxDuration": 30 },
     "api/test.js": { "maxDuration": 30 }
   },
   "routes": [
@@ -14,6 +15,7 @@
     { "src": "/api/animate", "dest": "/api/animate.js" },
     { "src": "/api/animateStatus", "dest": "/api/animateStatus.js" },
     { "src": "/api/falkey", "dest": "/api/falkey.js" },
+    { "src": "/api/upload", "dest": "/api/upload.js" },
     { "src": "/api/scene", "dest": "/api/scene.js" },
     { "src": "/api/train", "dest": "/api/train.js" },
     { "src": "/api/trainStatus", "dest": "/api/trainStatus.js" },
