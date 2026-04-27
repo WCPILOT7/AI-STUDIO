@@ -4,27 +4,27 @@ module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const request_id = req.query.requestId;
+    const requestId = req.query.requestId;
     const falKey = process.env.FAL_API_KEY;
 
-    if (!request_id) throw new Error('No requestId provided');
+    if (!requestId) throw new Error('No requestId provided');
     if (!falKey) throw new Error('FAL_API_KEY not configured');
 
     const statusRes = await fetch(
-      `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${request_id}/status`,
+      `https://queue.fal.run/fal-ai/kling-video/v3/standard/image-to-video/requests/${requestId}/status`,
       { headers: { 'Authorization': `Key ${falKey}` } }
     );
 
     const text = await statusRes.text();
-    if (!text || text.trim() === '') return res.json({ status: 'processing' });
+    if (!text || text.trim() === '') return res.json({ status: 'IN_QUEUE' });
 
     let data;
     try { data = JSON.parse(text); }
-    catch(e) { return res.json({ status: 'processing' }); }
+    catch(e) { return res.json({ status: 'IN_QUEUE' }); }
 
     if (data.status === 'COMPLETED') {
       const resultRes = await fetch(
-        `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${request_id}`,
+        `https://queue.fal.run/fal-ai/kling-video/v3/standard/image-to-video/requests/${requestId}`,
         { headers: { 'Authorization': `Key ${falKey}` } }
       );
       const resultText = await resultRes.text();
@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
 
     if (data.status === 'FAILED') return res.json({ status: 'FAILED', error: data.error || 'Failed' });
 
-    return res.json({ status: 'IN_QUEUE', queue_position: data.queue_position });
+    return res.json({ status: data.status || 'IN_QUEUE' });
 
   } catch(err) {
     return res.status(500).json({ error: err.message });
