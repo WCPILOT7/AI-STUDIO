@@ -796,23 +796,29 @@ function renderVideosTab() {
 async function onStartFrameUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  toast('⬡ Uploading...');
+  toast('⬡ Processing image...');
   try {
     const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = reject;
+      img.src = url;
     });
-
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ base64, mimeType: file.type })
+      body: JSON.stringify({ base64, mimeType: 'image/jpeg' })
     });
     const data = await res.json();
-    if (!data.url) throw new Error('No URL returned');
-
+    if (!data.url) throw new Error(data.error || 'No URL returned');
     startFrameUrl = data.url;
     toast('✓ Image ready');
     renderVideosTab();
@@ -821,6 +827,10 @@ async function onStartFrameUpload(input) {
   }
 }
 
+function clearStartFrame() {
+  startFrameUrl = null;
+  renderVideosTab();
+}
 
 function useAsStartFrame(url) {
   startFrameUrl = url;
