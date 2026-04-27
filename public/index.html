@@ -846,7 +846,7 @@ function dlUrl(url) {
 // ── ANIMATE FROM PANEL (Videos tab) ──
 async function doAnimFromPanel() {
   const prompt = document.getElementById('sfPrompt')?.value?.trim();
-  const duration = document.getElementById('sfDuration')?.value || '10';
+  const duration = document.getElementById('sfDuration')?.value || '5';
   if (!startFrameUrl) return toast('Upload a start frame image first');
   if (!prompt) return toast('Add a motion prompt first');
 
@@ -856,7 +856,7 @@ async function doAnimFromPanel() {
   c.gens.unshift({ id: animId, type: 'video', prompt, url: null, loading: true, createdAt: Date.now() });
   save();
   renderVideosTab();
-  toast('⬡ Submitting to Kling...');
+  toast('⬡ Submitting to Kling 3.0...');
 
   try {
     const submitRes = await fetch('/api/animate', {
@@ -867,37 +867,61 @@ async function doAnimFromPanel() {
     const submitData = await submitRes.json();
     if (!submitData.requestId) throw new Error(submitData.error || 'No request ID returned');
 
-    toast('▶ Animation queued — polling every 8s...');
+    toast('▶ Queued — checking every 8s (~2 min)...');
 
     let attempts = 0;
     const poll = setInterval(async () => {
       attempts++;
-      if (attempts > 25) {
+      if (attempts > 30) {
         clearInterval(poll);
-        const g = getChar()?.gens?.find(x => x.id === animId);
-        if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+        const idx = chars.findIndex(c => c.id === activeId);
+        if (idx !== -1) {
+          const g = chars[idx].gens?.find(x => x.id === animId);
+          if (g) { g.loading = false; g.error = true; }
+          save();
+        }
+        if (charTab === 'videos') renderVideosTab();
         toast('⚠ Timed out — check fal.ai dashboard', 10000);
         return;
       }
       try {
         const statusRes = await fetch(`/api/animateStatus?requestId=${submitData.requestId}`);
         const statusData = await statusRes.json();
+
         if (statusData.status === 'COMPLETED' && statusData.videoUrl) {
           clearInterval(poll);
-          const g = getChar()?.gens?.find(x => x.id === animId);
-          if (g) { g.url = statusData.videoUrl; g.loading = false; save(); if (charTab==='videos') renderVideosTab(); toast('✦ Animation complete!'); }
+          const idx = chars.findIndex(c => c.id === activeId);
+          if (idx !== -1) {
+            const g = chars[idx].gens?.find(x => x.id === animId);
+            if (g) { g.url = statusData.videoUrl; g.loading = false; g.error = false; }
+            localStorage.setItem('ais4_chars', JSON.stringify(chars));
+          }
+          renderSidebar();
+          if (charTab === 'videos') renderVideosTab();
+          toast('✦ Animation complete! — Kling 3.0');
+
         } else if (statusData.status === 'FAILED') {
           clearInterval(poll);
-          const g = getChar()?.gens?.find(x => x.id === animId);
-          if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+          const idx = chars.findIndex(c => c.id === activeId);
+          if (idx !== -1) {
+            const g = chars[idx].gens?.find(x => x.id === animId);
+            if (g) { g.loading = false; g.error = true; }
+            save();
+          }
+          if (charTab === 'videos') renderVideosTab();
           toast('✗ Animation failed', 10000);
         }
-      } catch(e) { console.warn('Poll:', e); }
+      } catch(e) { console.warn('Poll error:', e); }
     }, 8000);
 
   } catch(err) {
-    const g = getChar()?.gens?.find(x => x.id === animId);
-    if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+    const idx = chars.findIndex(c => c.id === activeId);
+    if (idx !== -1) {
+      const g = chars[idx].gens?.find(x => x.id === animId);
+      if (g) { g.loading = false; g.error = true; }
+      save();
+    }
+    if (charTab === 'videos') renderVideosTab();
     toast('✗ ' + err.message, 10000);
   }
 }
