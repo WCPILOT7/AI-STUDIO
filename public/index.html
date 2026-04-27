@@ -249,7 +249,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 </style>
 </head>
 <body>
- 
+
 <nav class="topnav">
   <div class="nav-logo">
     <div class="nav-logo-name">AI <span>Studio</span></div>
@@ -267,7 +267,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     </div>
   </div>
 </nav>
- 
+
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="sb-sec">
@@ -279,9 +279,9 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     </div>
     <div class="chars-list" id="charsList"></div>
   </aside>
- 
+
   <main class="main">
- 
+
     <!-- CHARACTER STUDIO -->
     <div id="studioView" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
       <div class="char-tabs" id="charTabs" style="display:none">
@@ -302,7 +302,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
         </div>
       </div>
     </div>
- 
+
     <!-- SCENE STUDIO -->
     <div id="sceneView" style="display:none;height:100%;overflow:hidden;flex-direction:column">
       <div class="content" style="height:100%">
@@ -395,7 +395,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
         </div>
       </div>
     </div>
- 
+
     <!-- SETTINGS -->
     <div id="settingsView" style="display:none;height:100%;overflow-y:auto">
       <div class="content">
@@ -439,7 +439,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     </div>
   </main>
 </div>
- 
+
 <!-- Add Character Modal -->
 <div class="overlay" id="addModal">
   <div class="modal">
@@ -460,7 +460,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     </div>
   </div>
 </div>
- 
+
 <!-- Animate Modal (kept for Generate tab quick-animate) -->
 <div class="overlay" id="animModal">
   <div class="modal">
@@ -482,7 +482,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     </div>
   </div>
 </div>
- 
+
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -495,9 +495,9 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     <button class="btn-ghost" onclick="delFromLightbox()" style="color:var(--red);border-color:#3a1515">Delete</button>
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
 function compressImage(base64, maxSize) {
   return new Promise(resolve => {
@@ -514,7 +514,7 @@ function compressImage(base64, maxSize) {
     img.src = base64;
   });
 }
- 
+
 let chars = JSON.parse(localStorage.getItem('ais4_chars') || '[]');
 let activeId = null;
 let charTab = 'generate';
@@ -527,9 +527,9 @@ let sceneMode = 'text-to-video';
 let sceneImgUrl = null;
 let sceneItems = JSON.parse(localStorage.getItem('ais4_scenes') || '[]');
 let startFrameUrl = null;
- 
+
 renderSidebar();
- 
+
 // ── NAV ──
 function navTo(page) {
   ['tabStudio','tabScene','tabSettings'].forEach(id => document.getElementById(id).classList.remove('active'));
@@ -540,7 +540,7 @@ function navTo(page) {
   document.getElementById('sidebar').style.display = page==='studio' ? 'flex' : 'none';
   if (page==='scene') renderSceneGallery();
 }
- 
+
 // ── SIDEBAR ──
 function renderSidebar() {
   const el = document.getElementById('charsList');
@@ -561,7 +561,7 @@ function renderSidebar() {
     </div>
   `).join('');
 }
- 
+
 function selectChar(id) {
   activeId = id; charTab = 'generate';
   loraPhotos = [];
@@ -571,28 +571,28 @@ function selectChar(id) {
   document.querySelectorAll('.char-tab').forEach((t,i) => t.classList.toggle('active', i===0));
   renderCharContent();
 }
- 
+
 function getChar() { return chars.find(c => c.id === activeId); }
- 
+
 function save() {
   localStorage.setItem('ais4_chars', JSON.stringify(chars));
   renderSidebar();
 }
- 
+
 function setCharTab(tab, btn) {
   charTab = tab;
   document.querySelectorAll('.char-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   renderCharContent();
 }
- 
+
 function renderCharContent() {
   if (charTab === 'generate') renderGenerate();
   else if (charTab === 'images') renderImagesTab();
   else if (charTab === 'videos') renderVideosTab();
   else renderCharSettings();
 }
- 
+
 // ── GENERATE ──
 function renderGenerate() {
   const c = getChar(); if (!c) return;
@@ -655,7 +655,7 @@ function renderGenerate() {
     ta.addEventListener('input', () => ctr.textContent = `${ta.value.length} chars`);
   }
 }
- 
+
 function renderCards(gens) {
   return gens.map(g => `
     <div class="r-card">
@@ -678,7 +678,7 @@ function renderCards(gens) {
     </div>
   `).join('');
 }
- 
+
 // ── IMAGES TAB ──
 function renderImagesTab() {
   const c = getChar(); if (!c) return;
@@ -709,7 +709,7 @@ function renderImagesTab() {
          </div>`}
   </div>`;
 }
- 
+
 // ── VIDEOS TAB ──
 function renderVideosTab() {
   const c = getChar(); if (!c) return;
@@ -752,7 +752,7 @@ function renderVideosTab() {
              }).join('')}
            </div>`}
     </div>
- 
+
     <!-- Right: animate panel -->
     <div class="videos-right">
       <div class="panel-card">
@@ -771,7 +771,7 @@ function renderVideosTab() {
         </div>
         ${startFrameUrl ? `<button class="btn-ghost" style="width:100%;font-size:11px;padding:7px;margin-bottom:0" onclick="clearStartFrame()">✕ Clear frame</button>` : ''}
       </div>
- 
+
       <div class="panel-card" style="flex:1">
         <div class="panel-ttl">Motion Prompt</div>
         <textarea id="sfPrompt" class="prompt-ta" style="min-height:140px;margin-bottom:14px"
@@ -791,7 +791,7 @@ function renderVideosTab() {
     </div>
   </div>`;
 }
- 
+
 // ── START FRAME FUNCTIONS ──
 function onStartFrameUpload(input) {
   const file = input.files[0];
@@ -803,12 +803,12 @@ function onStartFrameUpload(input) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 function clearStartFrame() {
   startFrameUrl = null;
   renderVideosTab();
 }
- 
+
 function useAsStartFrame(url) {
   startFrameUrl = url;
   // Switch to Videos tab
@@ -819,21 +819,21 @@ function useAsStartFrame(url) {
   renderVideosTab();
   setTimeout(() => toast('Image set as start frame — add your prompt and animate'), 100);
 }
- 
+
 function dlUrl(url) {
   const a = document.createElement('a');
   a.href = url;
   a.download = 'ai-studio-' + Date.now() + (url.includes('.mp4') ? '.mp4' : '.jpg');
   a.click();
 }
- 
+
 // ── ANIMATE FROM PANEL (Videos tab) ──
 async function doAnimFromPanel() {
   const prompt = document.getElementById('sfPrompt')?.value?.trim();
   const duration = document.getElementById('sfDuration')?.value || '10';
   if (!startFrameUrl) return toast('Upload a start frame image first');
   if (!prompt) return toast('Add a motion prompt first');
- 
+
   const c = getChar();
   const animId = 'v' + Date.now();
   c.gens = c.gens || [];
@@ -841,7 +841,7 @@ async function doAnimFromPanel() {
   save();
   renderVideosTab();
   toast('⬡ Submitting to Kling...');
- 
+
   try {
     const submitRes = await fetch('/api/animate', {
       method: 'POST',
@@ -850,9 +850,9 @@ async function doAnimFromPanel() {
     });
     const submitData = await submitRes.json();
     if (!submitData.requestId) throw new Error(submitData.error || 'No request ID returned');
- 
+
     toast('▶ Animation queued — polling every 8s...');
- 
+
     let attempts = 0;
     const poll = setInterval(async () => {
       attempts++;
@@ -878,14 +878,14 @@ async function doAnimFromPanel() {
         }
       } catch(e) { console.warn('Poll:', e); }
     }, 8000);
- 
+
   } catch(err) {
     const g = getChar()?.gens?.find(x => x.id === animId);
     if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
     toast('✗ ' + err.message, 10000);
   }
 }
- 
+
 // ── ANIMATE FROM GENERATE TAB (quick animate modal) ──
 function openAnim(id) {
   animTarget = id;
@@ -893,7 +893,7 @@ function openAnim(id) {
   document.getElementById('animModal').classList.add('open');
 }
 function closeAnim() { document.getElementById('animModal').classList.remove('open'); }
- 
+
 async function doAnim() {
   const prompt = document.getElementById('animProm').value?.trim();
   if (!prompt) { toast('Describe the motion first'); return; }
@@ -905,7 +905,7 @@ async function doAnim() {
   c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
   save(); closeAnim(); renderGenerate();
   toast('▶ Submitting to Kling 2.1...');
- 
+
   try {
     const dur = parseInt(document.getElementById('animDur')?.value) || 10;
     const submitRes = await fetch('/api/animate', {
@@ -915,9 +915,9 @@ async function doAnim() {
     });
     const submitData = await submitRes.json();
     if (!submitData.requestId) throw new Error(submitData.error || 'No request ID returned');
- 
+
     toast('▶ Animation queued — polling for result...');
- 
+
     let attempts = 0;
     const poll = setInterval(async () => {
       attempts++;
@@ -945,7 +945,7 @@ async function doAnim() {
         }
       } catch(e) { console.warn('Poll error:', e); }
     }, 8000);
- 
+
   } catch(err) {
     const g = getChar()?.gens?.find(x => x.id === animId);
     if (g) { g.loading = false; g.error = true; save(); }
@@ -953,7 +953,7 @@ async function doAnim() {
     toast('Animation error: ' + (err.message || 'Failed'), 10000);
   }
 }
- 
+
 // ── GENERATE IMAGE ──
 async function doGenerate() {
   const c = getChar(); if (!c) return;
@@ -984,7 +984,7 @@ async function doGenerate() {
     toast('✗ ' + err.message, 10000);
   }
 }
- 
+
 // ── DELETE ──
 function deleteGen(id) {
   const c = getChar(); if (!c) return;
@@ -992,7 +992,7 @@ function deleteGen(id) {
   save();
   renderCharContent();
 }
- 
+
 // ── LIGHTBOX ──
 function openLightbox(id) {
   const c = getChar(); if (!c) return;
@@ -1013,26 +1013,26 @@ function openLightbox(id) {
   }
   if (prompt) prompt.textContent = g.prompt || '';
 }
- 
+
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
   const vid = document.getElementById('lightboxVid');
   if (vid) { vid.pause(); vid.src = ''; }
   currentLightboxId = null;
 }
- 
+
 function dlFromLightbox() {
   const c = getChar(); if (!c || !currentLightboxId) return;
   const g = (c.gens||[]).find(x => x.id === currentLightboxId);
   if (g?.url) dlUrl(g.url);
 }
- 
+
 function delFromLightbox() {
   if (!currentLightboxId) return;
   deleteGen(currentLightboxId);
   closeLightbox();
 }
- 
+
 // ── CHARACTER SETTINGS ──
 function renderCharSettings() {
   const c = getChar();
@@ -1093,7 +1093,7 @@ function renderCharSettings() {
   </div>`;
   if (isTraining) startTrainingPoll(c.id);
 }
- 
+
 // ── CHARACTER CRUD ──
 function openAdd() {
   pendingImg = null;
@@ -1104,7 +1104,7 @@ function openAdd() {
   document.getElementById('addModal').classList.add('open');
 }
 function closeAdd() { document.getElementById('addModal').classList.remove('open'); }
- 
+
 function onFile(input) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -1118,7 +1118,7 @@ function onFile(input) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 function saveChar() {
   const name = document.getElementById('nameInp').value.trim();
   if (!name) return toast('Enter a character name');
@@ -1126,7 +1126,7 @@ function saveChar() {
   chars.push({ id, name, img: pendingImg, gens: [], createdAt: Date.now() });
   save(); closeAdd(); selectChar(id);
 }
- 
+
 function updateCharImg(input, id) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -1137,12 +1137,12 @@ function updateCharImg(input, id) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 function updateCharName(val, id) {
   const c = chars.find(x => x.id === id);
   if (c && val.trim()) { c.name = val.trim(); save(); renderSidebar(); }
 }
- 
+
 function deleteChar(id) {
   if (!confirm('Delete this character and all their generations?')) return;
   chars = chars.filter(c => c.id !== id);
@@ -1151,7 +1151,7 @@ function deleteChar(id) {
   document.getElementById('charTabs').style.display = 'none';
   document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Your studio awaits</div><div class="empty-p">Create your first character to start generating.</div><button class="btn-blue" onclick="openAdd()" style="margin-top:6px">Add character</button></div>`;
 }
- 
+
 function clearAll() {
   if (!confirm('Clear all characters and generations? This cannot be undone.')) return;
   chars = []; activeId = null;
@@ -1162,7 +1162,7 @@ function clearAll() {
   document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio cleared</div><div class="empty-p">Create your first character to get started.</div><button class="btn-blue" onclick="openAdd()" style="margin-top:6px">Add character</button></div>`;
   toast('All data cleared');
 }
- 
+
 // ── LORA ──
 function addLoraPhotos(input) {
   const files = Array.from(input.files);
@@ -1178,7 +1178,7 @@ function addLoraPhotos(input) {
     reader.readAsDataURL(file);
   });
 }
- 
+
 function updateLoraGrid() {
   const grid = document.getElementById('loraPhotosGrid');
   const count = document.getElementById('loraPhotoCount');
@@ -1192,7 +1192,7 @@ function updateLoraGrid() {
   if (count) count.textContent = `${loraPhotos.length} photos selected`;
   if (btn) btn.disabled = loraPhotos.length < 5;
 }
- 
+
 async function startLoraTraining(charId) {
   const c = chars.find(x => x.id === charId); if (!c) return;
   if (loraPhotos.length < 5) return toast('Upload at least 5 photos');
@@ -1215,7 +1215,7 @@ async function startLoraTraining(charId) {
     if (btn) { btn.disabled = false; btn.textContent = '◈ Start LoRA Training (~$2 · 20 mins)'; }
   }
 }
- 
+
 async function checkTrainingStatus(charId) {
   const c = chars.find(x => x.id === charId); if (!c || !c.lora_training_id) return;
   try {
@@ -1235,12 +1235,12 @@ async function checkTrainingStatus(charId) {
     }
   } catch(err) { toast('✗ Could not check status', 10000); }
 }
- 
+
 function startTrainingPoll(charId) {
   if (trainingInterval) clearInterval(trainingInterval);
   trainingInterval = setInterval(() => checkTrainingStatus(charId), 60000);
 }
- 
+
 function retrainLora(charId) {
   const c = chars.find(x => x.id === charId); if (!c) return;
   if (!confirm('Start a new LoRA training run?')) return;
@@ -1248,7 +1248,7 @@ function retrainLora(charId) {
   loraPhotos = [];
   save(); renderCharSettings();
 }
- 
+
 // ── SCENE STUDIO ──
 function setSceneMode(mode, btn) {
   sceneMode = mode;
@@ -1256,7 +1256,7 @@ function setSceneMode(mode, btn) {
   btn.classList.add('active');
   document.getElementById('sceneImgUpload').style.display = mode === 'image-to-video' ? 'block' : 'none';
 }
- 
+
 function pickSceneType(el, type) {
   document.querySelectorAll('.scene-type').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -1269,7 +1269,7 @@ function pickSceneType(el, type) {
   const ta = document.getElementById('scenePrompt');
   if (ta && starters[type]) ta.value = starters[type];
 }
- 
+
 function onSceneImg(input) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -1283,7 +1283,7 @@ function onSceneImg(input) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 function useStarter(key) {
   const starters = {
     'pov-cafe': "POV: You're sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book, holds your gaze for a moment, then smiles softly. Warm golden tones. Shallow depth of field.",
@@ -1296,16 +1296,16 @@ function useStarter(key) {
   const ta = document.getElementById('scenePrompt');
   if (ta && starters[key]) ta.value = starters[key];
 }
- 
+
 async function generateScene() {
   const prompt = document.getElementById('scenePrompt')?.value?.trim();
   if (!prompt) return toast('Write a scene prompt first');
   const btn = document.getElementById('sceneBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
- 
+
   const duration = document.getElementById('sceneDuration')?.value || '10';
   const aspect = document.getElementById('sceneAspect')?.value || '9:16';
- 
+
   document.getElementById('sceneResults').style.display = 'block';
   const grid = document.getElementById('sceneGrid');
   const loadId = 'sc' + Date.now();
@@ -1314,11 +1314,11 @@ async function generateScene() {
   loadCard.innerHTML = `<div class="scene-loading"><div class="spin"></div><div class="spin-txt">${sceneMode==='text-to-image'?'Generating':'Animating'}</div></div>`;
   grid.prepend(loadCard);
   toast('▶ Generating scene...');
- 
+
   try {
     const body = { prompt, mode: sceneMode, duration, aspect_ratio: aspect };
     if (sceneMode === 'image-to-video' && sceneImgUrl) body.image_url = sceneImgUrl;
- 
+
     const res = await fetch('/api/scene', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1326,11 +1326,11 @@ async function generateScene() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Scene generation failed');
- 
+
     const item = { id: loadId, mode: sceneMode, prompt, url: data.url, createdAt: Date.now() };
     sceneItems.unshift(item);
     localStorage.setItem('ais4_scenes', JSON.stringify(sceneItems));
- 
+
     const card = document.getElementById(loadId);
     if (card) {
       if (sceneMode === 'text-to-image') {
@@ -1348,7 +1348,7 @@ async function generateScene() {
     if (btn) { btn.disabled = false; btn.textContent = '▶ Generate Scene'; }
   }
 }
- 
+
 function renderSceneGallery() {
   const grid = document.getElementById('sceneGrid');
   if (!grid || !sceneItems.length) return;
@@ -1363,7 +1363,7 @@ function renderSceneGallery() {
       </div>
     </div>`).join('');
 }
- 
+
 // ── TOAST ──
 let toastTimer;
 function toast(msg, duration = 3500) {
@@ -1372,7 +1372,7 @@ function toast(msg, duration = 3500) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), duration);
 }
- 
+
 // ── KEYBOARD ──
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeLightbox(); closeAdd(); closeAnim(); }
@@ -1380,4 +1380,3 @@ document.addEventListener('keydown', e => {
 </script>
 </body>
 </html>
- 
