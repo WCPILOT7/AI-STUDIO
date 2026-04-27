@@ -793,20 +793,42 @@ function renderVideosTab() {
 }
 
 // ── START FRAME FUNCTIONS ──
-function onStartFrameUpload(input) {
+async function onStartFrameUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    startFrameUrl = e.target.result;
-    renderVideosTab();
-  };
-  reader.readAsDataURL(file);
-}
+  toast('⬡ Uploading to fal...');
+  try {
+    const keyRes = await fetch('/api/falkey');
+    const keyData = await keyRes.json();
+    const falKey = keyData.key;
 
-function clearStartFrame() {
-  startFrameUrl = null;
-  renderVideosTab();
+    // Use fal's multipart upload endpoint
+    const uploadRes = await fetch('https://fal.run/storage/upload/initiate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${falKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        content_type: file.type,
+        file_name: file.name
+      })
+    });
+    const { upload_url, file_url } = await uploadRes.json();
+
+    // Upload directly to the presigned URL
+    await fetch(upload_url, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file
+    });
+
+    startFrameUrl = file_url;
+    toast('✓ Image ready');
+    renderVideosTab();
+  } catch(err) {
+    toast('✗ ' + err.message, 5000);
+  }
 }
 
 function useAsStartFrame(url) {
