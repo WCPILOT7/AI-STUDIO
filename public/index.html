@@ -796,39 +796,30 @@ function renderVideosTab() {
 async function onStartFrameUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  toast('⬡ Uploading to fal...');
+  toast('⬡ Uploading...');
   try {
-    const keyRes = await fetch('/api/falkey');
-    const keyData = await keyRes.json();
-    const falKey = keyData.key;
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-    // Use fal's multipart upload endpoint
-    const uploadRes = await fetch('https://fal.run/storage/upload/initiate', {
+    const res = await fetch('/api/upload', {
       method: 'POST',
-      headers: {
-        'Authorization': `Key ${falKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        content_type: file.type,
-        file_name: file.name
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, mimeType: file.type })
     });
-    const { upload_url, file_url } = await uploadRes.json();
+    const data = await res.json();
+    if (!data.url) throw new Error('No URL returned');
 
-    // Upload directly to the presigned URL
-    await fetch(upload_url, {
-      method: 'PUT',
-      headers: { 'Content-Type': file.type },
-      body: file
-    });
-
-    startFrameUrl = file_url;
+    startFrameUrl = data.url;
     toast('✓ Image ready');
     renderVideosTab();
   } catch(err) {
     toast('✗ ' + err.message, 5000);
   }
+}
 }
 
 function useAsStartFrame(url) {
