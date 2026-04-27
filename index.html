@@ -793,29 +793,15 @@ function renderVideosTab() {
 }
 
 // ── START FRAME FUNCTIONS ──
-async function onStartFrameUpload(input) {
+function onStartFrameUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  toast('⬡ Uploading image...');
-  try {
-    const keyRes = await fetch('/api/falkey');
-    const keyData = await keyRes.json();
-    const falKey = keyData.key;
-    const formData = new FormData();
-    formData.append('file', file);
-    const uploadRes = await fetch('https://rest.fal.ai/storage/upload', {
-      method: 'POST',
-      headers: { 'Authorization': `Key ${falKey}` },
-      body: formData
-    });
-    const uploadData = await uploadRes.json();
-    if (!uploadData.url) throw new Error('Upload failed: ' + JSON.stringify(uploadData));
-    startFrameUrl = uploadData.url;
-    toast('✓ Image ready');
+  const reader = new FileReader();
+  reader.onload = e => {
+    startFrameUrl = e.target.result;
     renderVideosTab();
-  } catch(err) {
-    toast('✗ ' + err.message, 5000);
-  }
+  };
+  reader.readAsDataURL(file);
 }
 
 function clearStartFrame() {
