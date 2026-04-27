@@ -242,6 +242,10 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
 .lora-trained-badge{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:9px;margin-bottom:16px}
 .lora-trained-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0}
 .lora-trained-txt{font-size:12px;color:#69f0ae;font-weight:400}
+/* Videos tab layout */
+.videos-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px;height:100%;min-height:0}
+.videos-left{overflow-y:auto;min-height:0}
+.videos-right{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 </style>
 </head>
 <body>
@@ -282,7 +286,8 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
     <div id="studioView" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
       <div class="char-tabs" id="charTabs" style="display:none">
         <button class="char-tab active" onclick="setCharTab('generate',this)">Generate</button>
-        <button class="char-tab" onclick="setCharTab('gallery',this)">Gallery</button>
+        <button class="char-tab" onclick="setCharTab('images',this)">◎ Images</button>
+        <button class="char-tab" onclick="setCharTab('videos',this)">⬡ Videos</button>
         <button class="char-tab" onclick="setCharTab('character',this)">Character</button>
       </div>
       <div class="content" id="studioContent">
@@ -307,8 +312,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
               <div class="scene-hero-title">Scene Studio</div>
               <div class="scene-hero-sub">Generate cinematic scenes, POV shots, moody environments and story moments for Soul AI Flames social content.</div>
             </div>
-
-            <!-- Mode selector -->
             <div class="panel-card">
               <div class="panel-ttl">Generation Mode</div>
               <div class="mode-tabs">
@@ -316,8 +319,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
                 <button class="mode-tab" onclick="setSceneMode('text-to-image',this)">◎ Text to Image</button>
                 <button class="mode-tab" onclick="setSceneMode('image-to-video',this)">⬡ Image to Video</button>
               </div>
-
-              <!-- Scene type selector -->
               <div class="panel-ttl" style="margin-top:4px">Scene Type</div>
               <div class="scene-type-grid">
                 <div class="scene-type active" onclick="pickSceneType(this,'pov')">
@@ -341,8 +342,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
                   <div class="scene-type-desc">Door opens, phone rings</div>
                 </div>
               </div>
-
-              <!-- Image upload for image-to-video mode -->
               <div id="sceneImgUpload" style="display:none">
                 <div class="panel-ttl">Source Image</div>
                 <div class="img-upload-zone" onclick="document.getElementById('sceneImgInput').click()">
@@ -354,23 +353,15 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
                   </div>
                 </div>
               </div>
-
-              <!-- Prompt -->
               <div class="panel-ttl">Scene Prompt</div>
               <textarea class="prompt-ta" id="scenePrompt" style="min-height:120px;margin-bottom:12px" placeholder="POV: You're sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book and holds your gaze for a moment..."></textarea>
-
-              <button class="btn-purple" onclick="generateScene()" id="sceneBtn" style="width:100%">
-                ▶ Generate Scene
-              </button>
+              <button class="btn-purple" onclick="generateScene()" id="sceneBtn" style="width:100%">▶ Generate Scene</button>
             </div>
-
-            <!-- Scene results -->
             <div id="sceneResults" style="display:none">
               <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--white);margin-bottom:12px">Generated Scenes</div>
               <div class="scene-results" id="sceneGrid"></div>
             </div>
           </div>
-
           <div class="scene-right">
             <div class="panel-card">
               <div class="panel-ttl">Video Settings</div>
@@ -381,7 +372,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
               <label class="s-lbl">Quality</label>
               <select class="s-sel" style="margin:0"><option selected>Standard — Kling 2.1</option></select>
             </div>
-
             <div class="panel-card">
               <div class="panel-ttl">Prompt Starters</div>
               <div style="display:flex;flex-direction:column;gap:6px">
@@ -393,7 +383,6 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
                 <button class="btn-ghost" style="text-align:left;font-size:11px;padding:8px 12px" onclick="useStarter('candles')">🕯 Candlelit room</button>
               </div>
             </div>
-
             <div class="panel-card">
               <div class="panel-ttl">Cost Estimate</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--textmut);line-height:2">
@@ -472,7 +461,7 @@ body::after{content:'';position:fixed;top:-150px;right:-100px;width:500px;height
   </div>
 </div>
 
-<!-- Animate Modal -->
+<!-- Animate Modal (kept for Generate tab quick-animate) -->
 <div class="overlay" id="animModal">
   <div class="modal">
     <div class="modal-h">Animate</div>
@@ -537,6 +526,7 @@ let trainingInterval = null;
 let sceneMode = 'text-to-video';
 let sceneImgUrl = null;
 let sceneItems = JSON.parse(localStorage.getItem('ais4_scenes') || '[]');
+let startFrameUrl = null;
 
 renderSidebar();
 
@@ -575,6 +565,7 @@ function renderSidebar() {
 function selectChar(id) {
   activeId = id; charTab = 'generate';
   loraPhotos = [];
+  startFrameUrl = null;
   renderSidebar();
   document.getElementById('charTabs').style.display = 'flex';
   document.querySelectorAll('.char-tab').forEach((t,i) => t.classList.toggle('active', i===0));
@@ -582,6 +573,11 @@ function selectChar(id) {
 }
 
 function getChar() { return chars.find(c => c.id === activeId); }
+
+function save() {
+  localStorage.setItem('ais4_chars', JSON.stringify(chars));
+  renderSidebar();
+}
 
 function setCharTab(tab, btn) {
   charTab = tab;
@@ -591,8 +587,9 @@ function setCharTab(tab, btn) {
 }
 
 function renderCharContent() {
-  if (charTab==='generate') renderGenerate();
-  else if (charTab==='gallery') renderGallery();
+  if (charTab === 'generate') renderGenerate();
+  else if (charTab === 'images') renderImagesTab();
+  else if (charTab === 'videos') renderVideosTab();
   else renderCharSettings();
 }
 
@@ -610,7 +607,7 @@ function renderGenerate() {
           <div class="hero-name">${c.name}</div>
           <div class="hero-tag">${tag} ${c.lora_model ? '<span style="font-size:9px;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2);padding:1px 6px;border-radius:3px;margin-left:6px">LoRA ✓</span>' : ''}</div>
           <div class="hero-stats">
-            <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='image').length}</div><div class="stat-l">Images</div></div>
+            <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type!=='video').length}</div><div class="stat-l">Images</div></div>
             <div><div class="stat-v">${(c.gens||[]).filter(g=>g.type==='video').length}</div><div class="stat-l">Videos</div></div>
             <div><div class="stat-v">${(c.gens||[]).length}</div><div class="stat-l">Total</div></div>
           </div>
@@ -663,46 +660,380 @@ function renderCards(gens) {
   return gens.map(g => `
     <div class="r-card">
       ${g.loading
-        ? `<div class="r-loading"><div class="spin"></div><div class="spin-txt">${g.type==='video'?'Animating':'Generating'}</div></div>`
-        : g.url
-          ? g.type==='video'
-            ? `<video class="r-vid" src="${g.url}" autoplay muted loop playsinline onclick="openLightbox('${g.id}')"></video>`
-            : `<img class="r-img" src="${g.url}" onclick="openLightbox('${g.id}')">`
-          : `<div class="r-ph"><div style="font-size:18px;color:var(--bluedim)">◎</div></div>`}
-      <span class="r-badge badge-${g.type}">${g.type}</span>
+        ? `<div class="${g.type==='video'?'r-loading-vid':'r-loading'}"><div class="spin"></div><div class="spin-txt">${g.type==='video'?'Animating':'Generating'}</div></div>`
+        : g.error
+          ? `<div class="${g.type==='video'?'r-loading-vid':'r-loading'}"><div style="font-size:18px">⚠</div><div class="spin-txt" style="color:var(--red)">Failed</div></div>`
+          : g.url
+            ? g.type==='video'
+              ? `<video class="r-vid" src="${g.url}" autoplay muted loop playsinline onclick="openLightbox('${g.id}')"></video>`
+              : `<img class="r-img" src="${g.url}" onclick="openLightbox('${g.id}')">`
+            : `<div class="r-ph"><div style="font-size:18px;color:var(--bluedim)">◎</div></div>`}
+      <span class="r-badge badge-${g.type==='video'?'video':'image'}">${g.type==='video'?'VIDEO':'IMG'}</span>
+      ${!g.loading && !g.error && g.url ? `
       <div class="r-overlay">
-        ${g.type==='image' ? `<button class="r-act pri" onclick="openAnim('${g.id}')">▶ Animate</button>` : ''}
-        <button class="r-act" onclick="openLightbox('${g.id}')">⤢ View</button>
-        <button class="r-act" onclick="deleteGen('${g.id}')" style="color:#ef5350">✕</button>
-      </div>
+        ${g.type!=='video' ? `<button class="r-act pri" onclick="event.stopPropagation();openAnim('${g.id}')">▶ Anim</button>` : ''}
+        <button class="r-act" onclick="event.stopPropagation();openLightbox('${g.id}')">⤢</button>
+        <button class="r-act" onclick="event.stopPropagation();deleteGen('${g.id}')" style="color:#ef5350">✕</button>
+      </div>` : ''}
     </div>
   `).join('');
 }
 
-function renderGallery() {
-  const c = getChar();
-  const gens = (c.gens||[]).slice().reverse();
+// ── IMAGES TAB ──
+function renderImagesTab() {
+  const c = getChar(); if (!c) return;
+  const images = (c.gens||[]).filter(g => g.type !== 'video' && g.url && !g.loading && !g.error).slice().reverse();
   document.getElementById('studioContent').innerHTML = `
   <div class="fade">
-    <div class="gallery-tabs">
-      <button class="g-tab active" onclick="filterGal(this,'all')">All (${gens.length})</button>
-      <button class="g-tab" onclick="filterGal(this,'image')">Images (${gens.filter(g=>g.type==='image').length})</button>
-      <button class="g-tab" onclick="filterGal(this,'video')">Videos (${gens.filter(g=>g.type==='video').length})</button>
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white)">Images</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textdim);letter-spacing:0.1em">${images.length} GENERATED</div>
     </div>
-    ${gens.length
-      ? `<div class="gallery-grid" id="galGrid">${renderCards(gens)}</div>`
-      : `<div class="empty" style="height:300px"><div class="empty-icon">◎</div><div class="empty-h" style="font-size:18px">No generations yet</div><div class="empty-p">Switch to Generate to create your first image.</div></div>`}
+    ${images.length === 0
+      ? `<div class="empty" style="margin-top:60px">
+           <div class="empty-icon">◎</div>
+           <div class="empty-h">No images yet</div>
+           <div class="empty-p">Generate some images on the Generate tab first.</div>
+         </div>`
+      : `<div class="gallery-grid">
+           ${images.map(g => `
+             <div class="r-card" onclick="openLightbox('${g.id}')">
+               <img class="r-img" src="${g.url}" loading="lazy">
+               <div class="r-badge badge-image">IMG</div>
+               <div class="r-overlay">
+                 <button class="r-act pri" onclick="event.stopPropagation();useAsStartFrame('${g.url}')">▶ Animate</button>
+                 <button class="r-act" onclick="event.stopPropagation();dlUrl('${g.url}')">↓</button>
+                 <button class="r-act" onclick="event.stopPropagation();deleteGen('${g.id}')" style="color:#ef5350">✕</button>
+               </div>
+             </div>`).join('')}
+         </div>`}
   </div>`;
 }
 
-function filterGal(btn, type) {
-  document.querySelectorAll('.g-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  const gens = (getChar().gens||[]).slice().reverse().filter(g => type==='all'||g.type===type);
-  const grid = document.getElementById('galGrid');
-  if (grid) grid.innerHTML = renderCards(gens);
+// ── VIDEOS TAB ──
+function renderVideosTab() {
+  const c = getChar(); if (!c) return;
+  const videos = (c.gens||[]).filter(g => g.type === 'video').slice().reverse();
+  document.getElementById('studioContent').innerHTML = `
+  <div class="fade videos-wrap">
+    <!-- Left: gallery -->
+    <div class="videos-left">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:20px">
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white)">Videos</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textdim);letter-spacing:0.1em">${videos.length} GENERATED</div>
+      </div>
+      ${videos.length === 0
+        ? `<div class="empty" style="margin-top:60px">
+             <div class="empty-icon">⬡</div>
+             <div class="empty-h">No videos yet</div>
+             <div class="empty-p">Upload a start frame on the right and animate it.</div>
+           </div>`
+        : `<div class="gallery-grid">
+             ${videos.map(g => {
+               if (g.loading) return `
+                 <div class="r-card">
+                   <div class="r-loading-vid"><div class="spin"></div><div class="spin-txt">Generating</div></div>
+                   <div class="r-badge badge-video">VIDEO</div>
+                 </div>`;
+               if (g.error) return `
+                 <div class="r-card">
+                   <div class="r-loading-vid"><div style="font-size:20px">⚠</div><div class="spin-txt" style="color:var(--red)">Failed</div></div>
+                 </div>`;
+               return `
+                 <div class="r-card" onclick="openLightbox('${g.id}')">
+                   <video class="r-vid" src="${g.url}" muted loop playsinline autoplay></video>
+                   <div class="r-badge badge-video">VIDEO</div>
+                   <div class="r-overlay">
+                     <button class="r-act pri" onclick="event.stopPropagation();openLightbox('${g.id}')">⤢ View</button>
+                     <button class="r-act" onclick="event.stopPropagation();dlUrl('${g.url}')">↓</button>
+                     <button class="r-act" onclick="event.stopPropagation();deleteGen('${g.id}')" style="color:#ef5350">✕</button>
+                   </div>
+                 </div>`;
+             }).join('')}
+           </div>`}
+    </div>
+
+    <!-- Right: animate panel -->
+    <div class="videos-right">
+      <div class="panel-card">
+        <div class="panel-ttl">Start Frame</div>
+        <div id="sfDropZone" onclick="document.getElementById('sfFileInput').click()"
+          style="border:1px dashed var(--border3);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:10px"
+          onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(41,121,255,0.04)'"
+          onmouseout="this.style.borderColor='var(--border3)';this.style.background='transparent'">
+          <input type="file" id="sfFileInput" accept="image/*" style="display:none" onchange="onStartFrameUpload(this)">
+          <img id="sfPreview" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:${startFrameUrl?'block':'none'};border:1px solid var(--border3)" src="${startFrameUrl||''}">
+          <div id="sfPlaceholder" style="display:${startFrameUrl?'none':'block'}">
+            <div style="font-size:22px;margin-bottom:6px">◎</div>
+            <div style="font-size:12px;color:var(--textmut);margin-bottom:3px">Drop image or click to upload</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textdim)">From Higgsfield, MidJourney, anywhere</div>
+          </div>
+        </div>
+        ${startFrameUrl ? `<button class="btn-ghost" style="width:100%;font-size:11px;padding:7px;margin-bottom:0" onclick="clearStartFrame()">✕ Clear frame</button>` : ''}
+      </div>
+
+      <div class="panel-card" style="flex:1">
+        <div class="panel-ttl">Motion Prompt</div>
+        <textarea id="sfPrompt" class="prompt-ta" style="min-height:140px;margin-bottom:14px"
+          placeholder="She slowly turns toward camera, hair moving softly in the breeze. Eyes find the lens with quiet confidence. Cinematic, intimate."></textarea>
+        <div class="panel-ttl">Duration</div>
+        <select class="s-sel" id="sfDuration" style="margin-bottom:14px">
+          <option value="5">5 seconds</option>
+          <option value="10" selected>10 seconds</option>
+        </select>
+        <div style="background:rgba(41,121,255,0.06);border:1px solid rgba(41,121,255,0.14);border-radius:8px;padding:10px 12px;margin-bottom:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--textmut)">Kling 2.1 · image-to-video · ~$0.28–0.56</div>
+        </div>
+        <button class="btn-blue" style="width:100%;justify-content:center" onclick="doAnimFromPanel()">
+          ⬡ Animate Start Frame
+        </button>
+      </div>
+    </div>
+  </div>`;
 }
 
+// ── START FRAME FUNCTIONS ──
+function onStartFrameUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    startFrameUrl = e.target.result;
+    renderVideosTab();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearStartFrame() {
+  startFrameUrl = null;
+  renderVideosTab();
+}
+
+function useAsStartFrame(url) {
+  startFrameUrl = url;
+  // Switch to Videos tab
+  const tabs = document.querySelectorAll('.char-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs[2].classList.add('active');
+  charTab = 'videos';
+  renderVideosTab();
+  setTimeout(() => toast('Image set as start frame — add your prompt and animate'), 100);
+}
+
+function dlUrl(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ai-studio-' + Date.now() + (url.includes('.mp4') ? '.mp4' : '.jpg');
+  a.click();
+}
+
+// ── ANIMATE FROM PANEL (Videos tab) ──
+async function doAnimFromPanel() {
+  const prompt = document.getElementById('sfPrompt')?.value?.trim();
+  const duration = document.getElementById('sfDuration')?.value || '10';
+  if (!startFrameUrl) return toast('Upload a start frame image first');
+  if (!prompt) return toast('Add a motion prompt first');
+
+  const c = getChar();
+  const animId = 'v' + Date.now();
+  c.gens = c.gens || [];
+  c.gens.unshift({ id: animId, type: 'video', prompt, url: null, loading: true, createdAt: Date.now() });
+  save();
+  renderVideosTab();
+  toast('⬡ Submitting to Kling...');
+
+  try {
+    const submitRes = await fetch('/api/animate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, imageUrl: startFrameUrl, duration: String(duration) })
+    });
+    const submitData = await submitRes.json();
+    if (!submitData.requestId) throw new Error(submitData.error || 'No request ID returned');
+
+    toast('▶ Animation queued — polling every 8s...');
+
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      if (attempts > 25) {
+        clearInterval(poll);
+        const g = getChar()?.gens?.find(x => x.id === animId);
+        if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+        toast('⚠ Timed out — check fal.ai dashboard', 10000);
+        return;
+      }
+      try {
+        const statusRes = await fetch(`/api/animateStatus?requestId=${submitData.requestId}`);
+        const statusData = await statusRes.json();
+        if (statusData.status === 'COMPLETED' && statusData.videoUrl) {
+          clearInterval(poll);
+          const g = getChar()?.gens?.find(x => x.id === animId);
+          if (g) { g.url = statusData.videoUrl; g.loading = false; save(); if (charTab==='videos') renderVideosTab(); toast('✦ Animation complete!'); }
+        } else if (statusData.status === 'FAILED') {
+          clearInterval(poll);
+          const g = getChar()?.gens?.find(x => x.id === animId);
+          if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+          toast('✗ Animation failed', 10000);
+        }
+      } catch(e) { console.warn('Poll:', e); }
+    }, 8000);
+
+  } catch(err) {
+    const g = getChar()?.gens?.find(x => x.id === animId);
+    if (g) { g.loading = false; g.error = true; save(); if (charTab==='videos') renderVideosTab(); }
+    toast('✗ ' + err.message, 10000);
+  }
+}
+
+// ── ANIMATE FROM GENERATE TAB (quick animate modal) ──
+function openAnim(id) {
+  animTarget = id;
+  document.getElementById('animProm').value = '';
+  document.getElementById('animModal').classList.add('open');
+}
+function closeAnim() { document.getElementById('animModal').classList.remove('open'); }
+
+async function doAnim() {
+  const prompt = document.getElementById('animProm').value?.trim();
+  if (!prompt) { toast('Describe the motion first'); return; }
+  const c = getChar();
+  const srcGen = (c.gens||[]).find(g => g.id === animTarget);
+  const srcUrl = srcGen?.url;
+  if (!srcUrl) { toast('No image URL found'); return; }
+  const animId = 'v' + Date.now();
+  c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
+  save(); closeAnim(); renderGenerate();
+  toast('▶ Submitting to Kling 2.1...');
+
+  try {
+    const dur = parseInt(document.getElementById('animDur')?.value) || 10;
+    const submitRes = await fetch('/api/animate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, imageUrl: srcUrl, duration: String(dur) })
+    });
+    const submitData = await submitRes.json();
+    if (!submitData.requestId) throw new Error(submitData.error || 'No request ID returned');
+
+    toast('▶ Animation queued — polling for result...');
+
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      if (attempts > 25) {
+        clearInterval(poll);
+        const g = getChar()?.gens?.find(x => x.id === animId);
+        if (g) { g.loading = false; g.error = true; save(); }
+        if (charTab==='generate') renderGenerate();
+        toast('⚠ Timed out — check fal.ai dashboard', 10000);
+        return;
+      }
+      try {
+        const statusRes = await fetch(`/api/animateStatus?requestId=${submitData.requestId}`);
+        const statusData = await statusRes.json();
+        if (statusData.status === 'COMPLETED' && statusData.videoUrl) {
+          clearInterval(poll);
+          const g = getChar()?.gens?.find(x => x.id === animId);
+          if (g) { g.url = statusData.videoUrl; g.loading = false; save(); if (charTab==='generate') renderGenerate(); toast('✦ Animation complete!'); }
+        } else if (statusData.status === 'FAILED') {
+          clearInterval(poll);
+          const g = getChar()?.gens?.find(x => x.id === animId);
+          if (g) { g.loading = false; g.error = true; save(); }
+          if (charTab==='generate') renderGenerate();
+          toast('✗ Animation failed', 10000);
+        }
+      } catch(e) { console.warn('Poll error:', e); }
+    }, 8000);
+
+  } catch(err) {
+    const g = getChar()?.gens?.find(x => x.id === animId);
+    if (g) { g.loading = false; g.error = true; save(); }
+    if (charTab==='generate') renderGenerate();
+    toast('Animation error: ' + (err.message || 'Failed'), 10000);
+  }
+}
+
+// ── GENERATE IMAGE ──
+async function doGenerate() {
+  const c = getChar(); if (!c) return;
+  const prompt = document.getElementById('promptTa')?.value?.trim();
+  if (!prompt) return toast('Write a prompt first');
+  const btn = document.getElementById('genBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
+  c.lastPrompt = prompt;
+  const genId = 'g' + Date.now();
+  c.gens = c.gens || [];
+  c.gens.unshift({ id: genId, type: 'image', prompt, url: null, loading: true, createdAt: Date.now() });
+  save(); renderGenerate();
+  toast('◎ Generating image...');
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, characterImage: c.img, characterName: c.name, loraModel: c.lora_model || null })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Generation failed');
+    const g = getChar()?.gens?.find(x => x.id === genId);
+    if (g) { g.url = data.url; g.loading = false; save(); if (charTab==='generate') renderGenerate(); toast('✦ Image ready'); }
+  } catch(err) {
+    const g = getChar()?.gens?.find(x => x.id === genId);
+    if (g) { g.loading = false; g.error = true; save(); }
+    if (charTab==='generate') renderGenerate();
+    toast('✗ ' + err.message, 10000);
+  }
+}
+
+// ── DELETE ──
+function deleteGen(id) {
+  const c = getChar(); if (!c) return;
+  c.gens = (c.gens||[]).filter(g => g.id !== id);
+  save();
+  renderCharContent();
+}
+
+// ── LIGHTBOX ──
+function openLightbox(id) {
+  const c = getChar(); if (!c) return;
+  const g = (c.gens||[]).find(x => x.id === id);
+  if (!g || !g.url) return;
+  currentLightboxId = id;
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  const vid = document.getElementById('lightboxVid');
+  const prompt = document.getElementById('lightboxPrompt');
+  lb.classList.add('open');
+  if (g.type === 'video') {
+    img.style.display = 'none'; vid.style.display = 'block';
+    vid.src = g.url; vid.play();
+  } else {
+    vid.style.display = 'none'; img.style.display = 'block';
+    img.src = g.url;
+  }
+  if (prompt) prompt.textContent = g.prompt || '';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  const vid = document.getElementById('lightboxVid');
+  if (vid) { vid.pause(); vid.src = ''; }
+  currentLightboxId = null;
+}
+
+function dlFromLightbox() {
+  const c = getChar(); if (!c || !currentLightboxId) return;
+  const g = (c.gens||[]).find(x => x.id === currentLightboxId);
+  if (g?.url) dlUrl(g.url);
+}
+
+function delFromLightbox() {
+  if (!currentLightboxId) return;
+  deleteGen(currentLightboxId);
+  closeLightbox();
+}
+
+// ── CHARACTER SETTINGS ──
 function renderCharSettings() {
   const c = getChar();
   const isTraining = c.lora_training_id && !c.lora_model;
@@ -763,6 +1094,161 @@ function renderCharSettings() {
   if (isTraining) startTrainingPoll(c.id);
 }
 
+// ── CHARACTER CRUD ──
+function openAdd() {
+  pendingImg = null;
+  document.getElementById('nameInp').value = '';
+  document.getElementById('uploadPrev').style.display = 'none';
+  document.getElementById('uploadIco').style.display = 'block';
+  document.getElementById('uploadTxt').textContent = 'Drop reference image here';
+  document.getElementById('addModal').classList.add('open');
+}
+function closeAdd() { document.getElementById('addModal').classList.remove('open'); }
+
+function onFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const compressed = await compressImage(e.target.result, 512);
+    pendingImg = compressed;
+    const prev = document.getElementById('uploadPrev');
+    prev.src = compressed; prev.style.display = 'block';
+    document.getElementById('uploadIco').style.display = 'none';
+    document.getElementById('uploadTxt').textContent = 'Image ready';
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveChar() {
+  const name = document.getElementById('nameInp').value.trim();
+  if (!name) return toast('Enter a character name');
+  const id = 'c' + Date.now();
+  chars.push({ id, name, img: pendingImg, gens: [], createdAt: Date.now() });
+  save(); closeAdd(); selectChar(id);
+}
+
+function updateCharImg(input, id) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const compressed = await compressImage(e.target.result, 512);
+    const c = chars.find(x => x.id === id);
+    if (c) { c.img = compressed; save(); renderCharContent(); toast('Reference image updated'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateCharName(val, id) {
+  const c = chars.find(x => x.id === id);
+  if (c && val.trim()) { c.name = val.trim(); save(); renderSidebar(); }
+}
+
+function deleteChar(id) {
+  if (!confirm('Delete this character and all their generations?')) return;
+  chars = chars.filter(c => c.id !== id);
+  activeId = null;
+  save();
+  document.getElementById('charTabs').style.display = 'none';
+  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Your studio awaits</div><div class="empty-p">Create your first character to start generating.</div><button class="btn-blue" onclick="openAdd()" style="margin-top:6px">Add character</button></div>`;
+}
+
+function clearAll() {
+  if (!confirm('Clear all characters and generations? This cannot be undone.')) return;
+  chars = []; activeId = null;
+  localStorage.removeItem('ais4_chars');
+  localStorage.removeItem('ais4_scenes');
+  save();
+  document.getElementById('charTabs').style.display = 'none';
+  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio cleared</div><div class="empty-p">Create your first character to get started.</div><button class="btn-blue" onclick="openAdd()" style="margin-top:6px">Add character</button></div>`;
+  toast('All data cleared');
+}
+
+// ── LORA ──
+function addLoraPhotos(input) {
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      const compressed = await compressImage(e.target.result, 768);
+      loraPhotos.push(compressed);
+      loaded++;
+      if (loaded === files.length) updateLoraGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function updateLoraGrid() {
+  const grid = document.getElementById('loraPhotosGrid');
+  const count = document.getElementById('loraPhotoCount');
+  const btn = document.getElementById('trainBtn');
+  if (grid) {
+    grid.innerHTML = loraPhotos.map(p => `<img class="lora-photo" src="${p}">`).join('') +
+      `<div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()">
+        <input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">+
+      </div>`;
+  }
+  if (count) count.textContent = `${loraPhotos.length} photos selected`;
+  if (btn) btn.disabled = loraPhotos.length < 5;
+}
+
+async function startLoraTraining(charId) {
+  const c = chars.find(x => x.id === charId); if (!c) return;
+  if (loraPhotos.length < 5) return toast('Upload at least 5 photos');
+  const btn = document.getElementById('trainBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting training...'; }
+  toast('◈ Starting LoRA training...');
+  try {
+    const res = await fetch('/api/train', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ characterId: charId, characterName: c.name, images: loraPhotos })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Training failed to start');
+    c.lora_training_id = data.trainingId;
+    save(); renderCharSettings();
+    toast('◈ Training started — check back in 20 minutes');
+  } catch(err) {
+    toast('✗ ' + err.message, 10000);
+    if (btn) { btn.disabled = false; btn.textContent = '◈ Start LoRA Training (~$2 · 20 mins)'; }
+  }
+}
+
+async function checkTrainingStatus(charId) {
+  const c = chars.find(x => x.id === charId); if (!c || !c.lora_training_id) return;
+  try {
+    const res = await fetch(`/api/trainStatus?trainingId=${c.lora_training_id}`);
+    const data = await res.json();
+    if (data.status === 'succeeded' && data.modelUrl) {
+      c.lora_model = data.modelUrl;
+      delete c.lora_training_id;
+      save(); renderCharSettings();
+      toast('✦ LoRA training complete!');
+    } else if (data.status === 'failed') {
+      delete c.lora_training_id;
+      save(); renderCharSettings();
+      toast('✗ Training failed', 10000);
+    } else {
+      toast(`Training status: ${data.status}`);
+    }
+  } catch(err) { toast('✗ Could not check status', 10000); }
+}
+
+function startTrainingPoll(charId) {
+  if (trainingInterval) clearInterval(trainingInterval);
+  trainingInterval = setInterval(() => checkTrainingStatus(charId), 60000);
+}
+
+function retrainLora(charId) {
+  const c = chars.find(x => x.id === charId); if (!c) return;
+  if (!confirm('Start a new LoRA training run?')) return;
+  delete c.lora_model;
+  loraPhotos = [];
+  save(); renderCharSettings();
+}
+
 // ── SCENE STUDIO ──
 function setSceneMode(mode, btn) {
   sceneMode = mode;
@@ -775,517 +1261,121 @@ function pickSceneType(el, type) {
   document.querySelectorAll('.scene-type').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   const starters = {
-    pov: 'POV: You\'re sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up and holds your gaze for a moment. Soft ambient light. Cinematic.',
-    environment: 'A beautifully lit modern London apartment at golden hour. Floor-to-ceiling windows with city views. Warm tones, minimal furniture, candles on the windowsill. Cinematic, editorial aesthetic.',
-    mood: 'Close-up of rain falling against a dark window at night. City lights blur and refract in the droplets. Slow motion. Moody, introspective. The kind of night you stay inside and overthink everything.',
-    story: 'A notification appears on a sleek iPhone screen on a marble countertop. A hand slowly reaches in and picks up the phone. The screen glows. Fingers hover before opening the message. Cinematic close-up.'
+    pov: "POV: You're sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book and holds your gaze for a moment. Slow push in. Cinematic warm tones.",
+    environment: "Empty luxury apartment, late afternoon. Golden hour light cuts through floor-to-ceiling windows. Dust particles drift slowly. City skyline visible in the distance. Slow drift through the space.",
+    mood: "Close-up of raindrops running down a window at night. City lights blur softly behind the glass. Reflections of neon. Quiet, melancholic atmosphere. Shallow depth of field.",
+    story: "A phone on a marble counter. It lights up and begins to vibrate. Someone's hand reaches in from the left side of frame and picks it up slowly. Camera stays still. Quiet tension."
   };
-  if (starters[type]) document.getElementById('scenePrompt').value = starters[type];
+  const ta = document.getElementById('scenePrompt');
+  if (ta && starters[type]) ta.value = starters[type];
 }
 
-function onSceneImg(inp) {
-  const file = inp.files[0]; if (!file) return;
+function onSceneImg(input) {
+  const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = async e => {
     const compressed = await compressImage(e.target.result, 1024);
     sceneImgUrl = compressed;
-    const prev = document.getElementById('sceneImgPreview');
-    prev.src = compressed; prev.style.display = 'block';
-    document.getElementById('sceneImgTxt').style.display = 'none';
+    const preview = document.getElementById('sceneImgPreview');
+    const txt = document.getElementById('sceneImgTxt');
+    if (preview) { preview.src = compressed; preview.style.display = 'block'; }
+    if (txt) txt.style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
 
 function useStarter(key) {
   const starters = {
-    'pov-cafe': 'POV: You\'re sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book and holds your gaze. Soft ambient light. Cinematic.',
-    'rain-window': 'Close-up of rain falling against a dark window at night. City lights blur and refract in the droplets. Slow motion. Moody, introspective. The kind of night you stay inside and overthink everything.',
-    'city-night': 'Aerial cinematic shot gliding over London at night. City lights shimmer below. The Thames reflects golden and blue. Slow, smooth camera movement. Atmospheric. Quiet luxury aesthetic.',
-    'phone-pickup': 'A notification appears on a sleek iPhone screen on a marble countertop. A hand slowly reaches in and picks up the phone. The screen glows softly. Fingers hover before opening the message. Cinematic close-up.',
-    'door-opens': 'A sleek apartment door slowly opens from the inside. Warm golden light spills out into a dark hallway. Slow motion. The feeling of someone arriving home. Cinematic, intimate, atmospheric.',
-    'candles': 'A beautifully arranged set of pillar candles burning on a dark marble surface. Flames flicker gently. Warm golden light dances across the surface. Slow motion close-up. Luxury, calm, editorial.'
+    'pov-cafe': "POV: You're sitting across from her in a quiet London café. Steam rises from your coffee cup. Rain taps softly against the window. She glances up from her book, holds your gaze for a moment, then smiles softly. Warm golden tones. Shallow depth of field.",
+    'rain-window': "Close-up of raindrops running down a window at night. City lights blur softly behind the glass. Reflections of neon signs. A hand reaches into frame and traces a droplet slowly. Quiet, melancholic atmosphere.",
+    'city-night': "Slow aerial drift over a rain-soaked city at night. Neon lights reflect off wet streets below. Traffic moves slowly. Cinematic wide shot. Atmospheric haze.",
+    'phone-pickup': "A phone on a marble surface lights up with a notification. A hand slowly picks it up. Screen glows. Camera stays still, watching. Quiet tension. Minimal movement.",
+    'door-opens': "A door at the end of a dimly lit hallway slowly opens. Warm light spills through from the other side. Camera slowly pushes forward toward the light. Cinematic and mysterious.",
+    'candles': "Close-up of several candles burning on a dark surface. Flames flicker gently. Warm amber light dances on the surrounding surfaces. Slow focus pull between foreground and background candles."
   };
-  if (starters[key]) document.getElementById('scenePrompt').value = starters[key];
+  const ta = document.getElementById('scenePrompt');
+  if (ta && starters[key]) ta.value = starters[key];
 }
 
 async function generateScene() {
   const prompt = document.getElementById('scenePrompt')?.value?.trim();
-  if (!prompt) { toast('Write a scene prompt first'); return; }
-  if (sceneMode === 'image-to-video' && !sceneImgUrl) { toast('Upload an image first'); return; }
-
+  if (!prompt) return toast('Write a scene prompt first');
   const btn = document.getElementById('sceneBtn');
-  btn.disabled = true;
-  btn.textContent = sceneMode === 'text-to-image' ? '◎ Generating image...' : '▶ Generating video (~2 mins)...';
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
 
-  const duration = parseInt(document.getElementById('sceneDuration').value);
-  const aspect = document.getElementById('sceneAspect').value;
+  const duration = document.getElementById('sceneDuration')?.value || '10';
+  const aspect = document.getElementById('sceneAspect')?.value || '9:16';
 
-  const sceneId = 's' + Date.now();
-  const isVideo = sceneMode !== 'text-to-image';
-  sceneItems.unshift({ id: sceneId, type: isVideo ? 'video' : 'image', prompt, url: null, loading: true, createdAt: Date.now() });
-  saveScenes();
-  renderSceneGallery();
   document.getElementById('sceneResults').style.display = 'block';
-
-  try {
-    const res = await fetch('/api/scene', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        mode: sceneMode,
-        image_url: sceneImgUrl,
-        duration,
-        aspect_ratio: aspect
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Scene generation failed');
-
-    const item = sceneItems.find(s => s.id === sceneId);
-    if (item) { item.url = data.url; item.type = data.type; item.loading = false; saveScenes(); renderSceneGallery(); }
-    toast('✦ Scene generated');
-
-  } catch(err) {
-    const item = sceneItems.find(s => s.id === sceneId);
-    if (item) { item.loading = false; item.error = true; saveScenes(); }
-    renderSceneGallery();
-    toast('Error: ' + (err.message || 'Failed'), 10000);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '▶ Generate Scene';
-  }
-}
-
-function renderSceneGallery() {
   const grid = document.getElementById('sceneGrid');
-  const results = document.getElementById('sceneResults');
-  if (!grid) return;
-  if (!sceneItems.length) { if(results) results.style.display = 'none'; return; }
-  if(results) results.style.display = 'block';
-  grid.innerHTML = sceneItems.map(s => `
-    <div class="scene-card">
-      ${s.loading
-        ? `<div class="scene-loading"><div class="spin"></div><div class="spin-txt">${s.type==='video'?'Generating':'Creating'}</div></div>`
-        : s.url
-          ? s.type === 'video'
-            ? `<video class="scene-vid" src="${s.url}" autoplay muted loop playsinline></video>`
-            : `<img class="scene-img" src="${s.url}">`
-          : `<div class="scene-loading"><div style="color:var(--red);font-size:20px">✕</div><div class="spin-txt">Failed</div></div>`}
-      <span class="r-badge badge-${s.type}" style="top:7px;right:7px">${s.type}</span>
-      <div class="scene-overlay">
-        <button class="r-act" onclick="openSceneLightbox('${s.id}')">⤢ View</button>
-        <button class="r-act" onclick="dlScene('${s.id}')">↓ Save</button>
-        <button class="r-act" onclick="deleteScene('${s.id}')" style="color:#ef5350">✕</button>
-      </div>
-    </div>
-  `).join('');
-}
+  const loadId = 'sc' + Date.now();
+  const loadCard = document.createElement('div');
+  loadCard.className = 'scene-card'; loadCard.id = loadId;
+  loadCard.innerHTML = `<div class="scene-loading"><div class="spin"></div><div class="spin-txt">${sceneMode==='text-to-image'?'Generating':'Animating'}</div></div>`;
+  grid.prepend(loadCard);
+  toast('▶ Generating scene...');
 
-function openSceneLightbox(id) {
-  const s = sceneItems.find(x => x.id === id);
-  if (!s?.url) return;
-  currentLightboxId = 'scene:' + id;
-  const img = document.getElementById('lightboxImg');
-  const vid = document.getElementById('lightboxVid');
-  if (s.type === 'video') { vid.src = s.url; vid.style.display = 'block'; img.style.display = 'none'; }
-  else { img.src = s.url; img.style.display = 'block'; vid.style.display = 'none'; }
-  document.getElementById('lightboxPrompt').textContent = s.prompt || '';
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function dlScene(id) {
-  const s = sceneItems.find(x => x.id === id);
-  if (!s?.url) return;
-  const a = document.createElement('a'); a.href = s.url; a.download = `scene_${id}`; a.click();
-}
-
-function deleteScene(id) {
-  if (!confirm('Delete this scene?')) return;
-  sceneItems = sceneItems.filter(s => s.id !== id);
-  saveScenes(); renderSceneGallery();
-  toast('Scene deleted');
-}
-
-function saveScenes() {
-  try { localStorage.setItem('ais4_scenes', JSON.stringify(sceneItems)); }
-  catch(e) { toast('Storage limit reached'); }
-}
-
-// ── GENERATE IMAGE ──
-async function doGenerate() {
-  const c = getChar();
-  const prompt = document.getElementById('promptTa')?.value?.trim();
-  if (!prompt) { toast('Write a prompt first'); return; }
-  c.lastPrompt = prompt;
-  const btn = document.getElementById('genBtn');
-  if (btn) { btn.disabled = true; btn.innerHTML = `<div class="spin" style="width:13px;height:13px;border-width:1px"></div> Generating...`; }
-  const genId = 'g' + Date.now();
-  if (!c.gens) c.gens = [];
-  c.gens.push({ id: genId, type: 'image', prompt, url: null, loading: true, createdAt: Date.now() });
-  save(); renderGenerate();
   try {
-    const aspectEl = document.getElementById('aspectRatio');
-    const aspectMap = { 'Portrait 4:5': '4:5', 'Portrait 3:4': '3:4', 'Square 1:1': '1:1', 'Story 9:16': '9:16' };
-    const aspect = aspectMap[aspectEl?.value] || '3:4';
-    const body = { prompt, aspect_ratio: aspect };
-    if (c.lora_model) body.lora_model = c.lora_model;
-    if (c.img && !c.lora_model) body.reference_image = c.img;
-    const res = await fetch('/api/generate', {
+    const body = { prompt, mode: sceneMode, duration, aspect_ratio: aspect };
+    if (sceneMode === 'image-to-video' && sceneImgUrl) body.image_url = sceneImgUrl;
+
+    const res = await fetch('/api/scene', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Generation failed');
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === genId);
-    if (g) { g.url = data.url; g.loading = false; save(); renderGenerate(); toast('✦ Image generated — click ▶ Animate to bring her to life'); }
-  } catch(err) {
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === genId);
-    if (g) { g.loading = false; g.error = true; save(); }
-    renderGenerate();
-    toast('Error: ' + (err.message || 'Generation failed'));
-  }
-}
+    if (!res.ok) throw new Error(data.error || 'Scene generation failed');
 
-// ── ANIMATE ──
-async function doAnim() {
-  const prompt = document.getElementById('animProm')?.value?.trim();
-  if (!prompt) { toast('Describe the motion first'); return; }
-  const c = getChar();
-  const srcGen = (c.gens||[]).find(g => g.id === animTarget);
-  const srcUrl = srcGen?.url;
-  if (!srcUrl) { toast('No image URL found'); return; }
-  const animId = 'v' + Date.now();
-  c.gens.push({ id: animId, type: 'video', prompt, url: null, loading: true, sourceId: animTarget, createdAt: Date.now() });
-  save(); closeAnim(); renderGenerate();
-  toast('▶ Submitting to Kling 2.1...');
-  try {
-    const dur = parseInt(document.getElementById('animDur')?.value) || 10;
-    const keyRes = await fetch('/api/falkey');
-    const keyData = await keyRes.json();
-    if (!keyData.key) throw new Error('Could not get API key');
-    const falKey = keyData.key;
-    const submitRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video', {
-      method: 'POST',
-      headers: { 'Authorization': `Key ${falKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_url: srcUrl, duration: String(dur), negative_prompt: 'blur, distortion, watermark, low quality' })
-    });
-    const submitText = await submitRes.text();
-    let submitData;
-    try { submitData = JSON.parse(submitText); }
-    catch(e) { throw new Error('Submit failed: ' + submitText.slice(0, 200)); }
-    if (!submitRes.ok) throw new Error(submitData.detail || submitData.message || 'Submission failed');
-    if (!submitData.request_id) throw new Error('No request ID returned');
-    toast('▶ Animation queued — polling for result...');
-    const videoUrl = await pollFalDirect(submitData.request_id, falKey);
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === animId);
-    if (g) { g.url = videoUrl; g.loading = false; save(); renderGenerate(); toast('✦ Animation complete!'); }
-  } catch(err) {
-    const c2 = getChar();
-    const g = c2?.gens?.find(x => x.id === animId);
-    if (g) { g.loading = false; g.error = true; save(); }
-    renderGenerate();
-    toast('Animation error: ' + (err.message || 'Failed'), 10000);
-  }
-}
+    const item = { id: loadId, mode: sceneMode, prompt, url: data.url, createdAt: Date.now() };
+    sceneItems.unshift(item);
+    localStorage.setItem('ais4_scenes', JSON.stringify(sceneItems));
 
-async function pollFalDirect(requestId, falKey, max = 60) {
-  for (let i = 0; i < max; i++) {
-    await new Promise(r => setTimeout(r, 5000));
-    try {
-      const res = await fetch(
-        `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}/status`,
-        { headers: { 'Authorization': `Key ${falKey}` } }
-      );
-      const text = await res.text();
-      if (!text || text.trim() === '') continue;
-      let data;
-      try { data = JSON.parse(text); } catch(e) { continue; }
-      if (data.status === 'COMPLETED') {
-        const resultRes = await fetch(
-          `https://queue.fal.run/fal-ai/kling-video/v2.1/standard/image-to-video/requests/${requestId}`,
-          { headers: { 'Authorization': `Key ${falKey}` } }
-        );
-        const result = JSON.parse(await resultRes.text());
-        return result.video?.url || result.videos?.[0]?.url || null;
+    const card = document.getElementById(loadId);
+    if (card) {
+      if (sceneMode === 'text-to-image') {
+        card.innerHTML = `<img class="scene-img" src="${data.url}"><div class="scene-overlay"><button class="r-act" onclick="dlUrl('${data.url}')">↓ Save</button></div>`;
+      } else {
+        card.innerHTML = `<video class="scene-vid" src="${data.url}" autoplay muted loop playsinline></video><div class="scene-overlay"><button class="r-act" onclick="dlUrl('${data.url}')">↓ Save</button></div>`;
       }
-      if (data.status === 'FAILED') throw new Error('Animation failed');
-      if (data.queue_position !== undefined) toast(`▶ Queue position: ${data.queue_position}...`);
-    } catch(e) {
-      if (e.message.includes('failed') || e.message.includes('Failed')) throw e;
-      continue;
     }
+    toast('✦ Scene ready');
+  } catch(err) {
+    const card = document.getElementById(loadId);
+    if (card) card.innerHTML = `<div class="scene-loading"><div style="font-size:16px">⚠</div><div class="spin-txt" style="color:var(--red)">Failed</div></div>`;
+    toast('✗ ' + err.message, 10000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '▶ Generate Scene'; }
   }
-  throw new Error('Animation timed out');
-}
-function openAdd() {
-  pendingImg = null;
-  document.getElementById('addModal').classList.add('open');
-  setTimeout(() => document.getElementById('nameInp').focus(), 100);
-}
-// ── CHARACTER CRUD ──
-function openAdd() {
-  pendingImg = null;
-  document.getElementById('addModal').classList.add('open');
-  setTimeout(() => document.getElementById('nameInp').focus(), 100);
 }
 
-function closeAdd() {
-  document.getElementById('addModal').classList.remove('open');
-  document.getElementById('nameInp').value = '';
-  document.getElementById('uploadPrev').style.display = 'none';
-  document.getElementById('uploadIco').style.display = 'block';
-  document.getElementById('uploadTxt').textContent = 'Drop reference image here';
-  document.getElementById('uploadHint').textContent = 'PNG or JPG · clear face · good lighting';
-  pendingImg = null;
-}
-
-function onFile(inp) {
-  const file = inp.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingImg = e.target.result;
-    const prev = document.getElementById('uploadPrev');
-    prev.src = pendingImg; prev.style.display = 'block';
-    document.getElementById('uploadIco').style.display = 'none';
-    document.getElementById('uploadTxt').textContent = 'Reference image ready ✓';
-    document.getElementById('uploadHint').textContent = file.name;
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveChar() {
-  const name = document.getElementById('nameInp').value.trim();
-  if (!name) { toast('Enter a character name'); return; }
-  const compressedImg = pendingImg ? await compressImage(pendingImg, 512) : null;
-  const c = { id: 'c' + Date.now(), name, img: compressedImg, gens: [], lastPrompt: '', createdAt: Date.now() };
-  chars.push(c); save(); closeAdd(); selectChar(c.id); toast(`✦ ${name} created`);
-}
-
-function deleteChar(id) {
-  if (!confirm('Delete this character and all their generations?')) return;
-  chars = chars.filter(c => c.id !== id); save(); activeId = null; renderSidebar();
-  document.getElementById('charTabs').style.display = 'none';
-  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio ready</div><div class="empty-p">Create a new character to get started.</div></div>`;
-}
-
-function updateCharImg(inp, id) {
-  const file = inp.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async e => {
-    const c = chars.find(x => x.id === id);
-    if (c) { c.img = await compressImage(e.target.result, 512); save(); renderCharContent(); toast('Reference image updated'); }
-  };
-  reader.readAsDataURL(file);
-}
-
-function updateCharName(name, id) {
-  const c = chars.find(x => x.id === id);
-  if (c && name.trim()) { c.name = name.trim(); save(); renderSidebar(); }
-}
-
-// ── LORA ──
-function addLoraPhotos(input) {
-  const files = Array.from(input.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxSize = 512;
-        let w = img.width, h = img.height;
-        if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
-        else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        loraPhotos.push(canvas.toDataURL('image/jpeg', 0.7));
-        updateLoraGrid();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function updateLoraGrid() {
-  const grid = document.getElementById('loraPhotosGrid');
-  const count = document.getElementById('loraPhotoCount');
-  const trainBtn = document.getElementById('trainBtn');
-  if (!grid) return;
-  const photoHtml = loraPhotos.map((p, i) => `
-    <div style="position:relative">
-      <img src="${p}" class="lora-photo">
-      <button onclick="removeLoraPhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:10px;cursor:pointer;line-height:1">✕</button>
+function renderSceneGallery() {
+  const grid = document.getElementById('sceneGrid');
+  if (!grid || !sceneItems.length) return;
+  document.getElementById('sceneResults').style.display = 'block';
+  grid.innerHTML = sceneItems.map(item => `
+    <div class="scene-card">
+      ${item.mode === 'text-to-image'
+        ? `<img class="scene-img" src="${item.url}">`
+        : `<video class="scene-vid" src="${item.url}" autoplay muted loop playsinline></video>`}
+      <div class="scene-overlay">
+        <button class="r-act" onclick="dlUrl('${item.url}')">↓ Save</button>
+      </div>
     </div>`).join('');
-  grid.innerHTML = photoHtml + `<div class="lora-photo-add" onclick="document.getElementById('loraFileInput').click()"><input type="file" id="loraFileInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="addLoraPhotos(this)">+</div>`;
-  if (count) count.textContent = `${loraPhotos.length} photo${loraPhotos.length===1?'':'s'} selected`;
-  if (trainBtn) {
-    trainBtn.disabled = loraPhotos.length < 5;
-    trainBtn.textContent = loraPhotos.length < 5 ? `◈ Need at least 5 photos (${loraPhotos.length} added)` : `◈ Start LoRA Training — ${loraPhotos.length} photos (~$2 · 20 mins)`;
-  }
 }
 
-function removeLoraPhoto(index) { loraPhotos.splice(index, 1); updateLoraGrid(); }
-
-function retrainLora(charId) {
-  loraPhotos = [];
-  const c = chars.find(x => x.id === charId);
-  if (c) { c.lora_model = null; c.lora_training_id = null; save(); renderCharSettings(); }
-}
-
-async function startLoraTraining(charId) {
-  const c = chars.find(x => x.id === charId);
-  if (!c || loraPhotos.length < 5) { toast('Add at least 5 photos first'); return; }
-  const btn = document.getElementById('trainBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Starting training...'; }
-  toast('Starting LoRA training — 15-25 minutes');
-  try {
-    const res = await fetch('/api/train', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ images: loraPhotos, character_name: c.name })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Training failed to start');
-    c.lora_training_id = data.training_id;
-    save(); loraPhotos = []; renderCharSettings();
-    toast('✦ Training started! Check back in 20 mins');
-  } catch(err) {
-    toast('Training error: ' + (err.message || 'Failed'));
-    if (btn) { btn.disabled = false; btn.textContent = `◈ Start LoRA Training (~$2 · 20 mins)`; }
-  }
-}
-
-async function checkTrainingStatus(charId) {
-  const c = chars.find(x => x.id === charId);
-  if (!c?.lora_training_id) return;
-  const btn = document.querySelector('[onclick*="checkTrainingStatus"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
-  try {
-    const res = await fetch('/api/trainStatus', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ training_id: c.lora_training_id })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to check status');
-    if (data.status === 'succeeded' && data.model_id) {
-      c.lora_model = data.model_id; c.lora_training_id = null;
-      save(); renderSidebar(); renderCharSettings();
-      toast(`✦ ${c.name}'s LoRA complete! Her face is now locked.`);
-    } else if (data.status === 'failed') {
-      c.lora_training_id = null; save(); renderCharSettings();
-      toast('Training failed — try again with more photos');
-    } else {
-      const statusTxt = document.getElementById('trainingStatusTxt');
-      if (statusTxt) statusTxt.textContent = `⟳ Still training (${data.status}) — check again soon`;
-      if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
-      toast(`Status: ${data.status} — still in progress`);
-    }
-  } catch(err) {
-    toast('Error: ' + (err.message || 'Failed'));
-    if (btn) { btn.disabled = false; btn.textContent = '↻ Check status'; }
-  }
-}
-
-function startTrainingPoll(charId) {
-  if (trainingInterval) clearInterval(trainingInterval);
-  trainingInterval = setInterval(() => checkTrainingStatus(charId), 120000);
-}
-
-// ── ANIMATE MODAL ──
-function openAnim(genId) {
-  animTarget = genId;
-  document.getElementById('animModal').classList.add('open');
-  setTimeout(() => document.getElementById('animProm').focus(), 100);
-}
-
-function closeAnim() {
-  document.getElementById('animModal').classList.remove('open');
-  document.getElementById('animProm').value = '';
-  animTarget = null;
-}
-
-// ── LIGHTBOX ──
-function openLightbox(genId) {
-  const c = getChar();
-  const g = (c.gens||[]).find(x => x.id === genId);
-  if (!g?.url) return;
-  currentLightboxId = genId;
-  const img = document.getElementById('lightboxImg');
-  const vid = document.getElementById('lightboxVid');
-  if (g.type === 'video') { vid.src = g.url; vid.style.display = 'block'; img.style.display = 'none'; }
-  else { img.src = g.url; img.style.display = 'block'; vid.style.display = 'none'; }
-  document.getElementById('lightboxPrompt').textContent = g.prompt || '';
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightboxVid').src = '';
-  currentLightboxId = null;
-}
-
-function dlFromLightbox() {
-  if (!currentLightboxId) return;
-  if (currentLightboxId.startsWith('scene:')) {
-    dlScene(currentLightboxId.replace('scene:',''));
-    return;
-  }
-  const c = getChar();
-  const g = (c.gens||[]).find(x => x.id === currentLightboxId);
-  if (!g?.url) return;
-  const a = document.createElement('a'); a.href = g.url; a.download = `${c.name}_${currentLightboxId}`; a.click();
-}
-
-function delFromLightbox() {
-  if (!currentLightboxId) return;
-  if (currentLightboxId.startsWith('scene:')) { deleteScene(currentLightboxId.replace('scene:','')); closeLightbox(); return; }
-  deleteGen(currentLightboxId); closeLightbox();
-}
-
-function deleteGen(genId) {
-  const c = getChar();
-  if (!confirm('Delete this generation?')) return;
-  c.gens = (c.gens||[]).filter(g => g.id !== genId);
-  save(); renderCharContent(); renderSidebar();
-  toast('Generation deleted');
-}
-
-// ── UTILS ──
-function pickPill(el) {
-  document.querySelectorAll('.m-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function save() {
-  try { localStorage.setItem('ais4_chars', JSON.stringify(chars)); }
-  catch(e) { toast('Storage limit — clear old generations'); }
-}
-
-function clearAll() {
-  if (!confirm('Clear all data?')) return;
-  localStorage.removeItem('ais4_chars');
-  localStorage.removeItem('ais4_scenes');
-  chars = []; sceneItems = []; activeId = null; renderSidebar();
-  document.getElementById('charTabs').style.display = 'none';
-  document.getElementById('studioContent').innerHTML = `<div class="empty fade"><div class="empty-icon">✦</div><div class="empty-h">Studio cleared</div><div class="empty-p">Start fresh.</div></div>`;
-  toast('All data cleared');
-}
-
+// ── TOAST ──
+let toastTimer;
 function toast(msg, duration = 3500) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
-  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), duration);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), duration);
 }
 
+// ── KEYBOARD ──
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeAdd(); closeAnim(); closeLightbox(); }
+  if (e.key === 'Escape') { closeLightbox(); closeAdd(); closeAnim(); }
 });
 </script>
 </body>
